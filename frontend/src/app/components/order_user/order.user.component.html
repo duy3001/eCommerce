@@ -1,0 +1,112 @@
+<app-header></app-header>
+<div class="order-filter">
+  <button 
+    class="filter-btn" 
+    [ngClass]="{ 'active': selectedStatus === '' }" 
+    (click)="filterOrders('')">Tất cả
+  </button>
+  <button 
+    class="filter-btn" 
+    [ngClass]="{ 'active': selectedStatus === 'pending' }" 
+    (click)="filterOrders('pending')">Chờ duyệt
+  </button>
+  <button 
+    class="filter-btn"  
+    [ngClass]="{ 'active': selectedStatus === 'processing' }" 
+    (click)="filterOrders('processing')">Chờ lấy hàng
+  </button>
+  <button 
+    class="filter-btn"  
+    [ngClass]="{ 'active': selectedStatus === 'shipping' }" 
+    (click)="filterOrders('shipping')">Vận chuyển
+  </button>
+  <button 
+    class="filter-btn"  
+    [ngClass]="{ 'active': selectedStatus === 'delivered' }" 
+    (click)="filterOrders('delivered')">Hoàn thành
+  </button>
+  <button class="filter-btn"
+    [ngClass]="{ 'active': selectedStatus === 'canceled' }" 
+    (click)="filterOrders('canceled')">Đã huỷ
+  </button>
+  <button 
+    class="filter-btn"  
+    [ngClass]="{ 'active': selectedStatus === 'returned' }" 
+    (click)="filterOrders('returned')">Hoàn hàng
+  </button>
+</div>
+<div class="search-box d-flex align-items-center">
+  <input type="text" class="form-control search-input me-2" 
+         placeholder="Tìm đơn hàng" 
+         [(ngModel)]="keyword">
+  <button class="search-btn" (click)="searchOrders()"><i class="fa fa-search"></i> Tìm kiếm</button>
+</div>
+ <div class="orders-container">
+    <div *ngIf="orderResponses.length === 0" class="no-orders">
+      <p>Chưa có đơn hàng nào.</p>
+    </div>
+  
+    <div *ngFor="let order of orderResponses" class="order-card" (click)=selectOrder(order.id)>
+      <p><strong>Ngày đặt:</strong> {{ order.order_date | date:'dd/MM/yyyy' }}</p>
+      <div class="order-items">
+        <div *ngFor="let item of order.order_details" class="order-item">
+          <img [src]="item.thumbnail" alt="Sản phẩm" class="order-img" width="50"/>
+          
+          <div class="order-info">
+            <p class="order-name">{{ item.product_name }}</p>
+            <p>Số lượng x {{ item.number_of_products }}</p>
+          </div>
+  
+          <div class="order-price">
+            <p>Thành tiền</p>
+            <span class="price">{{ item.price | currency:'VND' }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="order-summary">
+        <span class="order-status">Trạng thái: {{ getStatusLabel(order.status) }}</span>
+        <button *ngIf="order.status === 'delivered'" class="return-btn">Yêu cầu hoàn hàng</button>
+        <span class="order-total"><strong>Tổng tiền:</strong> {{ order.total_money | currency:'VND' }}</span>
+      </div>
+      
+    </div>
+</div>
+
+<!-- <div class="order-list">
+    <h2>Danh sách đơn hàng</h2>
+    <div *ngFor="let order of orderResponses" class="order-card">
+      <h3>Đơn hàng #{{ order.id }}</h3>
+      <p><strong>Người mua:</strong> {{ order.fullname }}</p>
+      <p><strong>Ngày đặt hàng:</strong> {{ order.order_date | date:'dd/MM/yyyy' }}</p>
+      <p><strong>Ngày giao hàng:</strong> {{ order.shipping_date | date:'dd/MM/yyyy' }}</p>
+      <p><strong>Tổng tiền:</strong> {{ order.total_money | currency:'VND' }}</p>
+  
+      <h4 *ngIf="order.order_details.length > 0">Chi tiết đơn hàng:</h4>
+      <table *ngIf="order.order_details.length > 0">
+        <thead>
+          <tr>
+            <th>Hình ảnh</th>
+            <th>Sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Giá</th>
+            <th>Thành tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let detail of order.order_details">
+            <td>
+              <img *ngIf="detail.thumbnail" [src]="detail.thumbnail" alt="Ảnh sản phẩm" width="50">
+            </td>
+            <td>{{ detail.product_name}}</td>
+            <td>{{ detail.number_of_products }}</td>
+            <td>{{ detail.price | currency:'VND' }}</td>
+            <td>{{ detail.total_money | currency:'VND' }}</td>
+          </tr>
+        </tbody>
+      </table>
+  
+      <p *ngIf="order.order_details.length === 0" class="empty-message">
+        Không có sản phẩm trong đơn hàng này.
+      </p>
+    </div>
+  </div> -->

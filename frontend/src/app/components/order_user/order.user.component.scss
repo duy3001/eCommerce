@@ -1,0 +1,157 @@
+.orders-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.no-orders {
+  text-align: center;
+  font-size: 18px;
+  color: #777;
+}
+
+.order-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 10px;
+  background: white;
+  margin-bottom: 20px;
+}
+
+.order-card:hover {
+  background-color: #ddd;
+}
+
+.order-card h3 {
+  margin: 0;
+  color: #333;
+}
+
+.order-items {
+  margin-top: 15px;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.order-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-right: 10px;
+}
+
+.order-info {
+  flex: 1;
+}
+
+.order-name {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.order-category {
+  font-size: 14px;
+  color: #777;
+}
+
+.order-price {
+  text-align: right;
+}
+
+.price {
+  color: red;
+}
+
+.order-filter {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0px;
+  background-color: white;
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+  top: 70px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 860px;
+}
+
+.filter-btn {
+  flex: 1; 
+  text-align: center;
+  padding: 10px 0;
+  border: none;
+  background: #ddd;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.filter-btn.active {
+  background: #212529;
+  color: white;
+}
+
+.order-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 16px;
+  font-weight: bold;
+  text-align: right;
+  padding-top: 10px;
+}
+
+.return-btn {
+  background-color: #212529 ;
+  color: white;
+  border-radius: 5px;
+  margin-left: auto;
+}
+
+.order-total {
+  margin-left: 10px;
+}
+
+.search-box {
+  display: flex;
+  justify-content: center; /* Căn giữa các phần tử con */
+  align-items: center;
+  width: 100%; /* Đảm bảo nó chiếm toàn bộ không gian giữa */
+  max-width: 860px; /* Giới hạn chiều rộng tối đa */
+  margin: 0 auto; /* Giúp nó căn giữa trong phần tử cha */
+}
+
+.search-input {
+  flex: 1; /* Mở rộng để sử dụng hết không gian có thể */
+  min-width: 180px; /* Đảm bảo không quá nhỏ */
+  margin-right: 8px; 
+  border-color: black;
+}
+
+.search-btn {
+  white-space: nowrap; /* Giữ nội dung nút không bị xuống dòng */
+  background-color: #212529;
+  color: white;
+  border-radius: 5px;
+  padding: 6px;
+  border: 1px;
+}
+
+.search-btn:hover {
+  background-color: black;
+}
+
