@@ -3,7 +3,7 @@ package com.project.ecommerce.controllers;
 import com.project.ecommerce.dtos.PaymentDTO;
 import com.project.ecommerce.dtos.PaymentQueryDTO;
 import com.project.ecommerce.responses.ResponseObject;
-import com.project.ecommerce.services.IVNPayService;
+import com.project.ecommerce.services.payment.IVNPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

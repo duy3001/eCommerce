@@ -1,4 +1,4 @@
-package com.project.ecommerce.services;
+package com.project.ecommerce.services.role;
 
 import com.project.ecommerce.models.Role;
 import com.project.ecommerce.repositories.RoleRepository;

@@ -1,4 +1,4 @@
-package com.project.ecommerce.services;
+package com.project.ecommerce.services.category;
 
 import com.project.ecommerce.dtos.CategoryDTO;
 import com.project.ecommerce.models.Category;

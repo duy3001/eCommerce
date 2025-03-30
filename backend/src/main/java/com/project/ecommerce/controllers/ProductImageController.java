@@ -2,7 +2,7 @@ package com.project.ecommerce.controllers;
 
 import com.project.ecommerce.exceptions.DataNotFoundException;
 import com.project.ecommerce.models.ProductImage;
-import com.project.ecommerce.services.IProductImageService;
+import com.project.ecommerce.services.product.IProductImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

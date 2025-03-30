@@ -18,7 +18,7 @@ export class ToastService {
     let toastClass = 'bg-danger'; // Mặc định cho lỗi
     
     if (!error) {
-      toastClass = 'bg-success'; // Thành công
+      toastClass = '#212529'; // Thành công
     }
 
     if (error) {
@@ -46,18 +46,19 @@ export class ToastService {
     toast.classList.add('toast', 'show', toastClass, 'text-white');
     toast.style.minWidth = '300px';
     toast.style.marginBottom = '1rem';
-    toast.style.borderRadius = '4px';
+    toast.style.borderRadius = '5px';
+    
     toast.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
 
     // Nội dung toast
     toast.innerHTML = `
-      <div class="toast-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px">
-        <strong>${title}</strong>
+      <div class="toast-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background-color: #212529">
+        <strong style="color: white">${title}</strong>
         <button type="button" class="close-btn" style="background: none; border: none; color: white; cursor: pointer">
           &times;
         </button>
       </div>
-      <div class="toast-body" style="padding: 12px">
+      <div class="toast-body" style="padding: 12px; color: black">
         ${message}
       </div>
     `;

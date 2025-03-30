@@ -1,4 +1,4 @@
-package com.project.ecommerce.services;
+package com.project.ecommerce.services.user;
 
 import com.project.ecommerce.components.JwtTokenUtils;
 import com.project.ecommerce.dtos.UpdateUserDTO;

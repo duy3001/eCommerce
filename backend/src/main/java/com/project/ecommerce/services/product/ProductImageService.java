@@ -1,4 +1,4 @@
-package com.project.ecommerce.services;
+package com.project.ecommerce.services.product;
 
 import com.project.ecommerce.exceptions.DataNotFoundException;
 import com.project.ecommerce.models.ProductImage;

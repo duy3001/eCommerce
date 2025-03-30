@@ -4,7 +4,7 @@ import com.project.ecommerce.dtos.*;
 import com.project.ecommerce.models.Category;
 import com.project.ecommerce.responses.CategoryResponse;
 import com.project.ecommerce.responses.UpdateCategoryResponse;
-import com.project.ecommerce.services.CategoryService;
+import com.project.ecommerce.services.category.CategoryService;
 import com.project.ecommerce.utils.MessageKeys;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

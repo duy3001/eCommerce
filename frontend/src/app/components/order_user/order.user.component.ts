@@ -59,6 +59,7 @@ export class OrderUserComponent implements OnInit {
     const statusMap: { [key: string]: string } = {
       'pending': 'Chờ duyệt',
       'shipping': 'Đang vận chuyển',
+      'processing': 'Chờ lấy hàng',
       'delivered': 'Hoàn thành',
       'canceled': 'Đã hủy',
       'returned': 'Hoàn hàng'

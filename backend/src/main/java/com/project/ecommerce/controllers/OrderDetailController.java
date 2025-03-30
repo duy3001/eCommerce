@@ -4,7 +4,7 @@ import com.project.ecommerce.dtos.*;
 import com.project.ecommerce.exceptions.DataNotFoundException;
 import com.project.ecommerce.models.OrderDetail;
 import com.project.ecommerce.responses.OrderDetailResponse;
-import com.project.ecommerce.services.OrderDetailService;
+import com.project.ecommerce.services.orderDetail.OrderDetailService;
 import com.project.ecommerce.utils.MessageKeys;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

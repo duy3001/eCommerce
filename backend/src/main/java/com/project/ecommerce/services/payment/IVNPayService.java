@@ -1,4 +1,4 @@
-package com.project.ecommerce.services;
+package com.project.ecommerce.services.payment;
 
 import com.project.ecommerce.dtos.PaymentDTO;
 import com.project.ecommerce.dtos.PaymentQueryDTO;

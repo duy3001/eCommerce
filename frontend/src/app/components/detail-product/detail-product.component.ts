@@ -19,6 +19,7 @@ export class DetailProductComponent implements OnInit {
   currentImageIndex: number = 0;
   quantity: number = 1;
   isPressedAddToCart: boolean = false;
+  thumbnailId: number = 0;
   constructor(
     private productService: ProductService,
     private cartService: CartService,
@@ -33,7 +34,6 @@ export class DetailProductComponent implements OnInit {
     const idParam = this.activatedRoute.snapshot.paramMap.get('id');
     debugger
     //this.cartService.clearCart();
-    //const idParam = 9 //fake tạm 1 giá trị
     if (idParam !== null) {
       this.productId = +idParam;
     }
@@ -48,9 +48,17 @@ export class DetailProductComponent implements OnInit {
             });
           }
           debugger
+          
+         
           this.product = response
-          // Bắt đầu với ảnh đầu tiên
-          this.showImage(0);
+          if (this.product && this.product.product_images && this.product.thumbnail) {
+            // Tìm index của ảnh có URL chứa thumbnail
+            this.thumbnailId = this.product.product_images.findIndex(
+              (img: ProductImage) => img.image_url.includes(this.product!.thumbnail)
+            );
+          
+          }
+          this.showImage(this.thumbnailId);
         },
         complete: () => {
           debugger;
@@ -99,7 +107,7 @@ export class DetailProductComponent implements OnInit {
       this.cartService.addToCart(this.product.id, this.quantity);
       this.toastService.showToast({
         error: null,
-        defaultMsg: 'Thêm thành công!',
+        defaultMsg: 'Thêm vào giỏ hàng thành công!',
         title: 'Thành Công'
       });
       this.router.navigate([''])

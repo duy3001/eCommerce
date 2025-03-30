@@ -5,7 +5,7 @@ import com.project.ecommerce.dtos.*;
 import com.project.ecommerce.models.Order;
 import com.project.ecommerce.models.User;
 import com.project.ecommerce.responses.*;
-import com.project.ecommerce.services.IOrderService;
+import com.project.ecommerce.services.order.IOrderService;
 import com.project.ecommerce.utils.MessageKeys;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -67,8 +67,6 @@ public class OrderController {
     @PostAuthorize("hasRole('ROLE_ADMIN') or returnObject.body.userId == authentication.principal.id")
     public ResponseEntity<?> getOrder(@Valid @PathVariable("id") Long orderId) {
         try {
-//            User loggedUser = securityUtils.getLoggedInUser();
-//            Long userId = loggedUser.getId();
             Order existingOrder = orderService.getOrderById(orderId);
             OrderResponse orderResponse = OrderResponse.fromOrder(existingOrder);
             return ResponseEntity.ok(orderResponse);

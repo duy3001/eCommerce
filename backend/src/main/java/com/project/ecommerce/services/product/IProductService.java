@@ -1,4 +1,4 @@
-package com.project.ecommerce.services;
+package com.project.ecommerce.services.product;
 import com.project.ecommerce.dtos.ProductDTO;
 import com.project.ecommerce.dtos.ProductImageDTO;
 import com.project.ecommerce.responses.ProductResponse;

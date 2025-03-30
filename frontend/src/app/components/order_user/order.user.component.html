@@ -65,6 +65,7 @@
       </div>
       <div class="order-summary">
         <span class="order-status">Trạng thái: {{ getStatusLabel(order.status) }}</span>
+        <button *ngIf="order.status === 'pending' || order.status === 'processing'" class="return-btn">Huỷ đặt hàng</button>
         <button *ngIf="order.status === 'delivered'" class="return-btn">Yêu cầu hoàn hàng</button>
         <span class="order-total"><strong>Tổng tiền:</strong> {{ order.total_money | currency:'VND' }}</span>
       </div>

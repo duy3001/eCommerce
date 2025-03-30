@@ -2,7 +2,7 @@ package com.project.ecommerce.controllers;
 
 import com.project.ecommerce.models.User;
 import com.project.ecommerce.responses.*;
-import com.project.ecommerce.services.IUserService;
+import com.project.ecommerce.services.user.IUserService;
 import com.project.ecommerce.utils.MessageKeys;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

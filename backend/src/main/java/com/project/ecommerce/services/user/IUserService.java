@@ -1,4 +1,4 @@
-package com.project.ecommerce.services;
+package com.project.ecommerce.services.user;
 
 import com.project.ecommerce.dtos.UpdateUserDTO;
 import com.project.ecommerce.dtos.UserDTO;

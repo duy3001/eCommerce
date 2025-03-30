@@ -1,4 +1,4 @@
-package com.project.ecommerce.services;
+package com.project.ecommerce.services.payment;
 
 import com.google.gson.Gson;
 import com.project.ecommerce.components.VNPayUtils;

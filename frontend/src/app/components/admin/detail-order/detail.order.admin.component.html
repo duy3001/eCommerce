@@ -18,7 +18,7 @@
         <select class="form-control" id="statusSelect" 
           [(ngModel)]="orderResponse.status">
           <option value="pending">Đợi duyệt</option>
-          <option value="processing">Processing</option>
+          <option value="processing">Chờ lấy hàng</option>
           <option value="shipped">Đã vận chuyển</option>
           <option value="delivered">Đã giao</option>
           <option value="cancelled">Đã huỷ</option>
@@ -40,11 +40,11 @@
         let i = index">
         <td>{{ order_detail.product_name }}</td>
         <td>
-          <p>{{order_detail.price}}</p>          
+          <p>{{order_detail.price | currency:'VND'}}</p>          
         <td>
           <p>{{order_detail.number_of_products}}</p>          
         </td>
-        <td>{{ order_detail.total_money }}</td>
+        <td>{{ order_detail.price * order_detail.number_of_products | currency:'VND' }}</td>
       </tr>
     </tbody>
   </table>  

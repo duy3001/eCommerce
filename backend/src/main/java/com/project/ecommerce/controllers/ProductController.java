@@ -6,7 +6,7 @@ import com.project.ecommerce.models.Product;
 import com.project.ecommerce.models.ProductImage;
 import com.project.ecommerce.responses.ProductListResponse;
 import com.project.ecommerce.responses.ProductResponse;
-import com.project.ecommerce.services.IProductService;
+import com.project.ecommerce.services.product.IProductService;
 import com.project.ecommerce.utils.MessageKeys;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

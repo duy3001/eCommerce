@@ -1,7 +1,7 @@
 package com.project.ecommerce.controllers;
 
 import com.project.ecommerce.models.Role;
-import com.project.ecommerce.services.RoleService;
+import com.project.ecommerce.services.role.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,4 +1,4 @@
-package com.project.ecommerce.services;
+package com.project.ecommerce.services.order;
 
 import com.project.ecommerce.dtos.OrderDTO;
 import com.project.ecommerce.exceptions.DataNotFoundException;

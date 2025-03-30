@@ -1,7 +1,7 @@
 package com.project.ecommerce.controllers;
 
 import com.project.ecommerce.models.Category;
-import com.project.ecommerce.services.CategoryService;
+import com.project.ecommerce.services.category.CategoryService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

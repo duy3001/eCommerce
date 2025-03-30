@@ -220,14 +220,12 @@ export class OrderComponent implements OnInit{
       );
   }
   confirmDelete(index: number): void {
-    if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-      // Xóa sản phẩm khỏi danh sách cartItems
-      this.cartItems.splice(index, 1);
-      // Cập nhật lại this.cart từ this.cartItems
-      this.updateCartFromCartItems();
-      // Tính toán lại tổng tiền
-      this.calculateTotal();
-    }
+    // Xóa sản phẩm khỏi danh sách cartItems
+    this.cartItems.splice(index, 1);
+    // Cập nhật lại this.cart từ this.cartItems
+    this.updateCartFromCartItems();
+    // Tính toán lại tổng tiền
+    this.calculateTotal();
   }
   // Hàm xử lý việc áp dụng mã giảm giá
   applyCoupon(): void {
