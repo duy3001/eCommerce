@@ -6,6 +6,9 @@ import { CartService } from '../../services/cart.service';
 import { environment } from '../../../environments/environment';
 import { ProductImage } from '../../models/product.image';
 import { ToastService } from 'src/app/services/toast.service';
+import { AuthGuard } from 'src/app/guards/auth.guard';
+import { ProductVariant } from 'src/app/models/product.variants';
+import { ApiResponse } from 'src/app/responses/api.response';
 
 @Component({
   selector: 'app-detail-product',
@@ -20,12 +23,21 @@ export class DetailProductComponent implements OnInit {
   quantity: number = 1;
   isPressedAddToCart: boolean = false;
   thumbnailId: number = 0;
+  variants: any[] = [];
+  selectedVariantId: number | null = null;
+  selectedVariant: ProductVariant | null = null; 
+  relatedProducts: Product[] = [];
+  relatedLimit: number = 18;
+  currentPage: number = 0;
+  categoryId: number = 0;
+  totalPages:number = 0;
   constructor(
     private productService: ProductService,
     private cartService: CartService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private toastService: ToastService,
+    private authGuard: AuthGuard,
   ) {
 
   }
@@ -39,26 +51,34 @@ export class DetailProductComponent implements OnInit {
     }
     if (!isNaN(this.productId)) {
       this.productService.getDetailProduct(this.productId).subscribe({
-        next: (response: any) => {
+        next: (apiresponse: ApiResponse) => {
           // Lấy danh sách ảnh sản phẩm và thay đổi URL
           debugger
+          const response = apiresponse.data;
           if (response.product_images && response.product_images.length > 0) {
             response.product_images.forEach((product_image: ProductImage, index: number) => {
               product_image.image_url = `${environment.apiBaseUrl}/products/images/${product_image.image_url}`;
             });
           }
           debugger
-          
-         
           this.product = response
           if (this.product && this.product.product_images && this.product.thumbnail) {
             // Tìm index của ảnh có URL chứa thumbnail
             this.thumbnailId = this.product.product_images.findIndex(
               (img: ProductImage) => img.image_url.includes(this.product!.thumbnail)
             );
-          
+
           }
+          console.log(this.productId)
+          
+          if(this.product) {
+            this.variants = this.product?.product_variants
+            this.categoryId = this.product?.category_id
+            this.getRelatedProduct(this.productId, this.product.category_id, this.currentPage, this.relatedLimit)
+          }
+          // console.log(this.variants);
           this.showImage(this.thumbnailId);
+          
         },
         complete: () => {
           debugger;
@@ -68,10 +88,41 @@ export class DetailProductComponent implements OnInit {
           console.error('Error fetching detail:', error);
         }
       });
+    
+
     } else {
       console.error('Invalid productId:', idParam);
     }
+
+
   }
+
+  getRelatedProduct(productId: number, categoryId: number, page: number, limit: number) {
+    if(this.product){
+      this.productService.getProductsByCategoryId(productId, categoryId, page, limit).subscribe({
+        next: (apiresponse: ApiResponse) => {    
+          const response = apiresponse.data;
+          this.relatedProducts = [
+            ...(this.relatedProducts || []),
+            ...response.products.map((product: any) => ({
+              ...product,
+              thumbnail: `${environment.apiBaseUrl}/products/images/${product.thumbnail}`
+            }))
+          ];
+          this.totalPages = response.totalPages;
+        },
+        complete: () => {
+          
+        },
+        error: (error: any) => {
+          console.log("Error: ", error)
+        }
+      
+      })
+    }
+    
+  }
+
   showImage(index: number): void {
     debugger
     if (this.product && this.product.product_images &&
@@ -86,6 +137,12 @@ export class DetailProductComponent implements OnInit {
       this.currentImageIndex = index;
     }
   }
+
+  selectVariant(variantId: number) {
+    this.selectedVariantId = this.selectedVariant?.id === variantId ? null : variantId;
+  }
+
+
   thumbnailClick(index: number) {
     debugger
     // Gọi khi một thumbnail được bấm
@@ -103,15 +160,26 @@ export class DetailProductComponent implements OnInit {
   addToCart(): void {
     debugger
     this.isPressedAddToCart = true;
-    if (this.product) {
-      this.cartService.addToCart(this.product.id, this.quantity);
+    if (!this.authGuard.canActivate(null as any, null as any)) {
+      return;
+    }
+    if (!this.selectedVariantId && this.variants.length > 0) {
+      this.toastService.showToast({
+        error: 'Vui lòng chọn một biến thể sản phẩm trước khi thêm vào giỏ hàng!',
+        defaultMsg: '',
+        title: 'Lỗi'
+      });
+      return;
+    }
+    if (this.product && this.selectedVariantId) {
+      this.cartService.addToCart(this.selectedVariantId, this.quantity);
       this.toastService.showToast({
         error: null,
         defaultMsg: 'Thêm vào giỏ hàng thành công!',
         title: 'Thành Công'
       });
-      this.router.navigate([''])
-    } else {
+    } 
+    else {
       // Xử lý khi product là null
       console.error('Không thể thêm sản phẩm vào giỏ hàng.');
     }
@@ -138,5 +206,17 @@ export class DetailProductComponent implements OnInit {
       this.addToCart();
     }
     this.router.navigate(['/orders']);
+  }
+
+  onProductClick(productId: number) {
+    debugger;
+    // Điều hướng đến trang detail-product với productId là tham số
+    window.location.href = `/products/${productId}`;
+    // this.router.navigate(['/products', productId]);
+  }
+
+  loadMoreRelated() {
+    this.currentPage++; 
+    this.getRelatedProduct(this.productId, this.categoryId, this.currentPage, this.relatedLimit)
   }
 }

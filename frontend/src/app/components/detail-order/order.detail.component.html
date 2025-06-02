@@ -16,7 +16,7 @@
         <div class="shipping-info">
             <h3>Thông tin giao hàng</h3>
             <p><strong>Người nhận:</strong> {{ orderResponse.fullname }}</p>
-            <p><strong>Địa chỉ:</strong> {{ orderResponse.address }}</p>
+            <p><strong>Địa chỉ:</strong> {{ orderResponse.shipping_address }}</p>
             <p><strong>Số điện thoại:</strong> {{ orderResponse.phone_number }}</p>
         </div>
     </div>
@@ -36,9 +36,16 @@
             <tbody *ngFor="let item of orderResponse.order_details">
                 <tr>
                     <td>
-                        <div class="product-info">
-                            <img [src]="item.thumbnail" alt="Product Image" class="product-image">
+                        <!-- <div class="product-info">
+                            
                             <span class="product-name">{{ item.product_name }}</span>
+                        </div> -->
+                        <div class="product-item">
+                            <img [src]="item.thumbnail" alt="Product Image" class="product-image">
+                            <div class="product-info">
+                                <p class="product-name" style="font-size: 16px; font-weight: bold;">{{ item.product_name }}</p>
+                                <p style="font-size: 14px;">{{ item.variant_name }}</p>
+                            </div>
                         </div>
                     </td>
                     <td>x {{ item.number_of_products }}</td>
@@ -65,8 +72,8 @@
 
     <!-- Nút hành động -->
     <div class="order-actions">
-        <button *ngIf="orderResponse.status === 'pending'" class="cancel-btn">Hủy đơn</button>
-        <button *ngIf="orderResponse.status === 'delivered'" class="return-btn">Yêu cầu hoàn hàng</button>
+        <button *ngIf="orderResponse.status === 'pending'" class="cancel-btn" (click)="cancelOrder('cancelled')">Hủy đơn</button>
+        <button *ngIf="orderResponse.status === 'delivered'" class="return-btn" (click)="cancelOrder('returned')">Yêu cầu hoàn hàng</button>
     </div>
 </div>
 

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Category } from '../../../models/category';
 import { CategoryService } from '../../../services/category.service';
+import { ApiResponse } from 'src/app/responses/api.response';
 
 @Component({
   selector: 'app-category-admin',
@@ -22,9 +23,9 @@ export class CategoryAdminComponent implements OnInit {
     }
     getCategories(page: number, limit: number) {
       this.categoryService.getCategories(page, limit).subscribe({
-        next: (categories: Category[]) => {
+        next: (apiresponse: ApiResponse) => {
           debugger;
-          this.categories = categories;
+          this.categories = apiresponse.data;
         },
         complete: () => {
           debugger;

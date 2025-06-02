@@ -1,6 +1,7 @@
 package com.project.ecommerce.services.category;
 
-import com.project.ecommerce.dtos.CategoryDTO;
+import com.project.ecommerce.dtos.category.CategoryDTO;
+import com.project.ecommerce.exceptions.DataNotFoundException;
 import com.project.ecommerce.models.Category;
 
 import java.util.List;

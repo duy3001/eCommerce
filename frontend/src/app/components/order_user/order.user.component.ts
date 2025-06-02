@@ -5,6 +5,7 @@ import { OrderResponse } from '../../responses/order/order.response';
 import { environment } from '../../../environments/environment';
 import { OrderDetail } from '../../models/order.detail';
 import { UserService } from 'src/app/services/user.service';
+import { ApiResponse } from 'src/app/responses/api.response';
 
 @Component({
   selector: 'app-order-user',
@@ -29,8 +30,9 @@ export class OrderUserComponent implements OnInit {
   getOrderByUser(keyword: string, status: string): void {
     debugger
     this.orderService.getOrdersByUser(keyword, status).subscribe({
-      next: (responses: any[]) => {
-        this.orderResponses = responses.map((response) => ({
+      next: (apiResponse: ApiResponse) => {
+        const responses = apiResponse.data;
+        this.orderResponses = responses.map((response: { order_details: OrderDetail[]; }) => ({
           ...response,
           order_details: response.order_details.map((detail: OrderDetail) => ({
             ...detail,
@@ -61,16 +63,18 @@ export class OrderUserComponent implements OnInit {
       'shipping': 'Đang vận chuyển',
       'processing': 'Chờ lấy hàng',
       'delivered': 'Hoàn thành',
-      'canceled': 'Đã hủy',
+      'cancelled': 'Đã hủy',
       'returned': 'Hoàn hàng'
     };
     return statusMap[status] || 'Không xác định';
   }
 
   selectOrder(orderId: number) {
-    console.log('orderId', orderId);
+    // console.log('orderId', orderId);
     this.router.navigate(['/orders/user', orderId])
   }
+
+
 
 
 }

@@ -16,13 +16,9 @@ public class ProductImageService implements IProductImageService{
 
     @Override
     @Transactional
-    public ProductImage deleteProductImage(Long productId)
+    public ProductImage deleteProductImage(Long imageId)
             throws DataNotFoundException {
-        Optional<ProductImage> productImage = productImageRepository.findById(productId);
-        if( productImage == null) {
-            throw new DataNotFoundException(String.format("Cannot find product image with id: %ld", productId));
-        }
-        productImageRepository.deleteById(productId);
+        productImageRepository.deleteById(imageId);
         return null;
     }
 }

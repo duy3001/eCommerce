@@ -15,20 +15,21 @@
 //     box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
 // }
 .product-info {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.product-item{
     display: flex;
     align-items: center;
 }
 
 .product-image {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     border-radius: 5px;
     margin-right: 10px;
-}
 
-.product-name {
-    color: black;
-    margin-right: 10px;
 }
 
 table {

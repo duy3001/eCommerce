@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { 
   FormBuilder, 
   FormGroup, 
@@ -13,6 +13,7 @@ import { UserService } from '../../services/user.service';
 import { TokenService } from '../../services/token.service';
 import { UserResponse } from '../../responses/user/user.response';
 import { UpdateUserDTO } from '../../dtos/user/update.user.dto';
+import { ToastService } from 'src/app/services/toast.service';
 @Component({
   selector: 'user-profile',
   templateUrl: './user.profile.component.html',
@@ -21,13 +22,16 @@ import { UpdateUserDTO } from '../../dtos/user/update.user.dto';
 export class UserProfileComponent implements OnInit {
   userResponse?: UserResponse;
   userProfileForm: FormGroup;
+  showChangePassword: boolean = false;
   token:string = '';
+  avatarUrl: string = 'assets/avatar.jpg';
   constructor(
     private formBuilder: FormBuilder,
     private activatedRoute: ActivatedRoute,
     private userService: UserService,
     private router: Router,
     private tokenService: TokenService,
+    private toastService: ToastService,
   ){        
     this.userProfileForm = this.formBuilder.group({
       fullname: [''],     
@@ -68,8 +72,8 @@ export class UserProfileComponent implements OnInit {
   }
   passwordMatchValidator(): ValidatorFn {
     return (formGroup: AbstractControl): ValidationErrors | null => {
-      const password = formGroup.get('password')?.value;
-      const retypedPassword = formGroup.get('retype_password')?.value;
+      const password = formGroup.get('newPassword')?.value;
+      const retypedPassword = formGroup.get('confirmPassword')?.value;
       if (password !== retypedPassword) {
         return { passwordMismatch: true };
       }
@@ -83,17 +87,20 @@ export class UserProfileComponent implements OnInit {
       const updateUserDTO: UpdateUserDTO = {
         fullname: this.userProfileForm.get('fullname')?.value,
         address: this.userProfileForm.get('address')?.value,
-        password: this.userProfileForm.get('password')?.value,
-        retype_password: this.userProfileForm.get('retype_password')?.value,
+        // password: this.userProfileForm.get('newPassword')?.value,
+        // retype_password: this.userProfileForm.get('confirmPassword')?.value,
         date_of_birth: this.userProfileForm.get('date_of_birth')?.value
       };
   
       this.userService.updateUserDetail(this.token, updateUserDTO)
         .subscribe({
           next: (response: any) => {
-            this.userService.removeUserFromLocalStorage();
-            this.tokenService.removeToken();
-            this.router.navigate(['/login']);
+            this.toastService.showToast({
+              error: null,
+              defaultMsg: "Cập nhật thông tin thành công!",
+              title: 'Thành Công'
+            });
+            window.location.reload();
           },
           error: (error: any) => {
             alert(error.error.message);
@@ -104,6 +111,18 @@ export class UserProfileComponent implements OnInit {
         alert('Mật khẩu và mật khẩu gõ lại chưa chính xác')
       }
     }
-  }    
+  } 
+  toggleChangePassword() {
+    this.showChangePassword = !this.showChangePassword;
+  }   
+
+  onAvatarChange(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = e => this.avatarUrl = e.target?.result as string;
+      reader.readAsDataURL(file);
+    }
+  }
 }
 

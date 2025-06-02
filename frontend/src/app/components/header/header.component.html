@@ -48,11 +48,10 @@
                                 popoverTitle="User Actions"
                                 triggers="click"
                                 [placement]="'bottom'">
-                      <a class="nav-link text-white"
-                           
+                      <a class="nav-link text-white"                           
                          [ngbPopover]="popoverContent"
                          (click)="togglePopover($event)">
-                          {{ userResponse.fullname }}
+                         <i class="fa-solid fa-user"></i> {{ userResponse.fullname }}
                       </a>
                       <ng-template #popoverContent>
                           <div class="popover-list">

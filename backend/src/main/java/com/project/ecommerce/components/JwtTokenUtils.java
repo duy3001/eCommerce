@@ -27,6 +27,7 @@ public class JwtTokenUtils {
         Map<String, Object> claims = new HashMap<>();
         claims.put("phoneNumber", user.getPhoneNumber());
         claims.put("userId", user.getId());
+        claims.put("role", user.getRole().getName());
         try {
             return Jwts.builder()
                     .setClaims(claims)

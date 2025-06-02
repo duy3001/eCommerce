@@ -15,7 +15,7 @@ public class MessageKeys {
     public static final String UPLOAD_IMAGES_FILE_LARGE = "File too large";
     public static final String UPLOAD_IMAGES_FILE_MUST_BE_IMAGE = "File must be image";
     public static final String INSERT_CATEGORY_FAILED = "Create category failed";
-    public static final String WRONG_PHONE_PASSWORD = "Wrong phone password";
+    public static final String WRONG_PHONE_PASSWORD = "Wrong phone or password";
     public static final String ROLE_DOES_NOT_EXISTS = "Role not exist";
 
 

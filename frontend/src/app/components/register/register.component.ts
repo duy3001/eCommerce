@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { RegisterDTO } from '../../dtos/user/register.dto';
+import { ApiResponse } from 'src/app/responses/api.response';
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -55,12 +56,10 @@ export class RegisterComponent {
         "password": this.password,
         "retype_password": this.retypePassword,
         "date_of_birth": this.dateOfBirth,
-        "facebook_account_id": 0,
-        "google_account_id": 0,
         "role_id": 1
     }
     this.userService.register(registerDTO).subscribe({
-        next: (response: any) => {
+        next: (apiResponse: ApiResponse) => {
           debugger
           const confirmation = window
             .confirm('Đăng ký thành công, mời bạn đăng nhập. Bấm "OK" để chuyển đến trang đăng nhập.');

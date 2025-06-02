@@ -5,6 +5,8 @@ import { InsertProductDTO } from '../../../../dtos/product/insert.product.dto';
 import { Category } from '../../../../models/category';
 import { CategoryService } from '../../../../services/category.service';
 import { ProductService } from '../../../../services/product.service';
+import { ProductVariantService } from 'src/app/services/product.variant.service';
+import { ApiResponse } from 'src/app/responses/api.response';
 @Component({
   selector: 'app-insert.product.admin',
   templateUrl: './insert.product.admin.component.html',
@@ -16,14 +18,16 @@ export class InsertProductAdminComponent implements OnInit {
     price: 0,
     description: '',
     category_id: 1,
-    images: []
+    images: [],
+    variants: []
   };
   categories: Category[] = []; // Dữ liệu động từ categoryService
   constructor(    
     private route: ActivatedRoute,
     private router: Router,
     private categoryService: CategoryService,    
-    private productService: ProductService,    
+    private productService: ProductService,   
+    private variantService: ProductVariantService 
   ) {
     
   } 
@@ -32,9 +36,9 @@ export class InsertProductAdminComponent implements OnInit {
   } 
   getCategories(page: number, limit: number) {
     this.categoryService.getCategories(page, limit).subscribe({
-      next: (categories: Category[]) => {
+      next: (apiresponse: ApiResponse) => {
         debugger
-        this.categories = categories;
+        this.categories = apiresponse.data;
       },
       complete: () => {
         debugger;
@@ -60,8 +64,9 @@ export class InsertProductAdminComponent implements OnInit {
     this.productService.insertProduct(this.insertProductDTO).subscribe({
       next: (response) => {
         debugger
+        const productId = response.id; // Assuming the response contains the newly created product's ID
         if (this.insertProductDTO.images.length > 0) {
-          const productId = response.id; // Assuming the response contains the newly created product's ID
+          
           this.productService.uploadImages(productId, this.insertProductDTO.images).subscribe({
             next: (imageResponse) => {
               debugger
@@ -77,6 +82,19 @@ export class InsertProductAdminComponent implements OnInit {
             }
           })          
         }
+
+        if (this.insertProductDTO.variants.length > 0) {
+          this.insertProductDTO.variants.forEach(variant => {
+            this.variantService.insertVariants(productId, variant).subscribe({
+              next: (response) => {
+                console.log(`Thêm biến thể "${variant}" thành công!`, response);
+              }, error:( error) => {
+                alert(error.error)
+                console.log('Error:', error)
+              }
+            })
+          })
+        }
       },
       error: (error) => {
         debugger
@@ -85,5 +103,9 @@ export class InsertProductAdminComponent implements OnInit {
         console.error('Error inserting product:', error);
       }
     });    
+  }
+
+  addVariant() {
+    this.insertProductDTO.variants.push({ variant: '', stock: 0});
   }
 }

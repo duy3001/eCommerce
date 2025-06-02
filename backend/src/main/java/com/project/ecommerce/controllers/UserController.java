@@ -1,5 +1,10 @@
 package com.project.ecommerce.controllers;
 
+import com.project.ecommerce.components.SecurityUtils;
+import com.project.ecommerce.dtos.user.ChangePasswordRequestDTO;
+import com.project.ecommerce.dtos.user.UpdateUserDTO;
+import com.project.ecommerce.dtos.user.UserDTO;
+import com.project.ecommerce.dtos.user.UserLoginDTO;
 import com.project.ecommerce.models.User;
 import com.project.ecommerce.responses.*;
 import com.project.ecommerce.services.user.IUserService;
@@ -16,7 +21,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import com.project.ecommerce.dtos.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -26,64 +30,42 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserController {
     private final IUserService userService;
+    private final SecurityUtils securityUtils;
 
     @PostMapping("/register")
-    //can we register an "admin" user ?
-    public ResponseEntity<RegisterResponse> createUser(
-            @Valid @RequestBody UserDTO userDTO,
-            BindingResult result
+    public ResponseEntity<ResponseObject> createUser(
+            @Valid @RequestBody UserDTO userDTO
     ) {
         RegisterResponse registerResponse = new RegisterResponse();
 
-        if (result.hasErrors()) {
-            List<String> errorMessages = result.getFieldErrors()
-                    .stream()
-                    .map(FieldError::getDefaultMessage)
-                    .toList();
-
-            registerResponse.setMessage(errorMessages.toString());
-            return ResponseEntity.badRequest().body(registerResponse);
-        }
-
-        if (!userDTO.getPassword().equals(userDTO.getRetypePassword())) {
-            registerResponse.setMessage(MessageKeys.PASSWORD_NOT_MATCH);
-            return ResponseEntity.badRequest().body(registerResponse);
-        }
-
-        try {
-            User user = userService.createUser(userDTO);
-            registerResponse.setMessage(MessageKeys.REGISTER_SUCCESSFULLY);
-            registerResponse.setUser(user);
-            return ResponseEntity.ok(registerResponse);
-        } catch (Exception e) {
-            registerResponse.setMessage(e.getMessage());
-            return ResponseEntity.badRequest().body(registerResponse);
-        }
+        User user = userService.createUser(userDTO);
+        registerResponse.setMessage(MessageKeys.REGISTER_SUCCESSFULLY);
+        registerResponse.setUser(user);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.CREATED)
+                .data(UserResponse.fromUser(user))
+                .message("Account registration successful")
+                .build());
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
+    public ResponseEntity<ResponseObject> login(
             @Valid @RequestBody UserLoginDTO userLoginDTO
-    ) {
+    ) throws Exception {
         // Kiểm tra thông tin đăng nhập và sinh token
-        try {
-            String token = userService.login(
-                    userLoginDTO.getPhoneNumber(),
-                    userLoginDTO.getPassword(),
-                    userLoginDTO.getRoleId() == null ? 1 : userLoginDTO.getRoleId()
-            );
-            // Trả về token trong response
-            return ResponseEntity.ok(LoginResponse.builder()
-                            .message(MessageKeys.LOGIN_SUCCESSFULLY)
-                            .token(token)
-                    .build());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    LoginResponse.builder()
-                            .message(MessageKeys.LOGIN_FAILED)
-                            .build()
-            );
-        }
+        String token = userService.login(
+                userLoginDTO.getPhoneNumber(),
+                userLoginDTO.getPassword()
+        );
+        LoginResponse loginResponse = LoginResponse.builder()
+                .message(MessageKeys.LOGIN_SUCCESSFULLY)
+                .token(token)
+                .build();
+        // Trả về token trong response
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.OK)
+                .data(loginResponse)
+                .build());
     }
     @PostMapping("/details")
     public ResponseEntity<UserResponse> getUserDetails(
@@ -147,6 +129,27 @@ public class UserController {
                     .message("Get users successfully")
                     .status(HttpStatus.OK)
                     .build());
+
+    }
+
+    @PutMapping("/change-password/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<ResponseObject> changePassword(
+            @PathVariable("id") Long userId,
+            @RequestBody ChangePasswordRequestDTO requestDTO) {
+
+        try {
+            userService.changePassword(userId, requestDTO);
+            return ResponseEntity.ok(ResponseObject.builder()
+                    .status(HttpStatus.OK)
+                    .message("Change password successfully!")
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ResponseObject.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .message(e.getMessage())
+                    .build());
+        }
 
     }
 }

@@ -1,4 +1,5 @@
-package com.project.ecommerce.dtos;
+package com.project.ecommerce.dtos.order;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -10,8 +11,8 @@ import lombok.*;
 @Setter
 public class CartItemDTO {
 
-    @JsonProperty("product_id")
-    private Long productId;
+    @JsonProperty("variant_id")
+    private Long variantId;
 
     @JsonProperty("quantity")
     private Integer quantity;

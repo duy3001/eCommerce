@@ -34,12 +34,18 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: space-between; /* Đảm bảo các phần tử cách đều */
+    justify-content: space-between;
+    /* Đảm bảo các phần tử cách đều */
     height: 480px;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 10px;
     text-align: left;
+    transition: transform 0.1s ease-in-out;
+}
+
+.product-item:hover {
+    transform: scale(1.02);
 }
 
 .product-content {
@@ -47,7 +53,8 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-start, end;
-    flex-grow: 1; /* Đảm bảo phần text giãn đều */
+    flex-grow: 1;
+    /* Đảm bảo phần text giãn đều */
 }
 
 .product-image {
@@ -69,19 +76,10 @@
     min-width: 60px;
 }
 
-.product-warranty {
-    color: $shopapp-tint-color;
-}
-
 .product-price {
     color: black;
     font-size: 16px;
     min-height: 40px;
-}
-
-.product-rating {
-    color: #FFD700;
-    margin-top: 10px;
 }
 
 .product-actions {
@@ -95,24 +93,16 @@
     /*margin-top, margin-right, margin-bottom, margin-left*/
 }
 
-.page-number {
-    cursor: pointer;
-    padding: 5px 10px;
-    border: 1px solid #ccc;
-    margin: 0 2px;
-    border-radius: 3px;
+.page-item a{  
+    color: #212529;
 }
 
-.page-number.active {
-    background-color: $shopapp-color !important;
-    color: #fff;
-    border-color: $shopapp-color !important;
+.pagination .page-item.active .page-link {
+    background-color: #212529;
+    border-color: #212529;
+    color: white;
 }
-.btn-primary {
-    background-color: $shopapp-color;
-    border-color: $shopapp-color;    
+
+.page-item{
+    cursor: pointer;
 }
-.btn.btn-primary {
-    margin-left: 10px;
-}
-  

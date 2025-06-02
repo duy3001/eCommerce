@@ -41,12 +41,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
-    @Column(name = "facebook_account_id")
-    private int facebookAccountId;
-
-    @Column(name = "google_account_id")
-    private int googleAccountId;
-
     @ManyToOne
     @JoinColumn(name = "role_id")
     private com.project.ecommerce.models.Role role;

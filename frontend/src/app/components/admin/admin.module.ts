@@ -16,6 +16,7 @@ import { UpdateCategoryAdminComponent } from './category/update/update.category.
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserAdminComponent } from './user/user.admin.component';
+import { RevenueAdminComponent } from './revenue/revenue.admin.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { UserAdminComponent } from './user/user.admin.component';
 
     InsertCategoryAdminComponent,
     UpdateCategoryAdminComponent,
-    UserAdminComponent
+    UserAdminComponent,
+    RevenueAdminComponent
   ],
   imports: [
     AdminRoutingModule, // import routes,

@@ -2,8 +2,10 @@ package com.project.ecommerce.controllers;
 
 import com.project.ecommerce.exceptions.DataNotFoundException;
 import com.project.ecommerce.models.ProductImage;
+import com.project.ecommerce.responses.ResponseObject;
 import com.project.ecommerce.services.product.IProductImageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,7 +28,7 @@ public class ProductImageController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> delete(@PathVariable Long id) throws DataNotFoundException, IOException {
+    public ResponseEntity<ResponseObject> delete(@PathVariable Long id) throws DataNotFoundException, IOException {
         ProductImage productImage = productImageService.deleteProductImage(id);
         if( productImage != null) {
             Path uploadDir = Paths.get("uploads");
@@ -37,6 +39,11 @@ public class ProductImageController {
                 throw new FileNotFoundException(String.format("Cannot find file with url: %s", filePath));
             }
         }
-        return ResponseEntity.ok().body(productImage);
+        return ResponseEntity.ok().body(
+                ResponseObject.builder()
+                        .message("Delete product image successfully")
+                        .data(productImage)
+                        .status(HttpStatus.OK)
+                        .build());
     }
 }

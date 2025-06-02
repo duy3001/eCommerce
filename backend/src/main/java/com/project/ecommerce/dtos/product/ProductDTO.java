@@ -1,4 +1,4 @@
-package com.project.ecommerce.dtos;
+package com.project.ecommerce.dtos.product;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -25,6 +25,5 @@ public class ProductDTO {
 
     @JsonProperty("category_id")
     private Long categoryId;
-
 
 }

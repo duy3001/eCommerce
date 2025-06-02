@@ -9,6 +9,8 @@ import { LoginResponse } from '../../responses/user/login.response';
 import { Role } from '../../models/role'; // Đường dẫn đến model Role
 import { UserResponse } from '../../responses/user/user.response';
 import { CartService } from '../../services/cart.service';
+import { ApiResponse } from 'src/app/responses/api.response';
+import { ToastService } from 'src/app/services/toast.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -19,13 +21,8 @@ export class LoginComponent implements OnInit{
 
   /*
   //Login user1
-  phoneNumber: string = '33445566';
-  password: string = '123456789';
-
-  //Login user2
-  phoneNumber: string = '0964896239';
-  password: string = '123456789';
-
+  phoneNumber: string = '0903428409';
+  password: string = '30011211';
 
   //Login admin
   phoneNumber: string = '11223344';
@@ -38,8 +35,9 @@ export class LoginComponent implements OnInit{
 
   roles: Role[] = []; // Mảng roles
   rememberMe: boolean = true;
-  selectedRole: Role | undefined; // Biến để lưu giá trị được chọn từ dropdown
+  //selectedRole: Role | undefined; // Biến để lưu giá trị được chọn từ dropdown
   userResponse?: UserResponse
+  loginError: string = '';
 
   onPhoneNumberChange() {
     console.log(`Phone typed: ${this.phoneNumber}`);
@@ -51,7 +49,7 @@ export class LoginComponent implements OnInit{
     private userService: UserService,
     private tokenService: TokenService,
     private roleService: RoleService,
-    private cartService: CartService
+    private cartService: CartService,
   ) { }
 
   ngOnInit() {
@@ -61,7 +59,7 @@ export class LoginComponent implements OnInit{
       next: (roles: Role[]) => { // Sử dụng kiểu Role[]
         debugger
         this.roles = roles;
-        this.selectedRole = roles.length > 0 ? roles[0] : undefined;
+        //this.selectedRole = roles.length > 0 ? roles[0] : undefined;
       },
       complete: () => {
         debugger
@@ -78,22 +76,18 @@ export class LoginComponent implements OnInit{
     this.router.navigate(['/register']); 
   }
   login() {
-    const message = `phone: ${this.phoneNumber}` +
-      `password: ${this.password}`;
-    //alert(message);
-    debugger
-
     const loginDTO: LoginDTO = {
       phone_number: this.phoneNumber,
       password: this.password,
-      role_id: this.selectedRole?.id ?? 1
+      //role_id: this.selectedRole?.id ?? 1
     };
     this.userService.login(loginDTO).subscribe({
-      next: (response: LoginResponse) => {
+      next: (apiResponse: ApiResponse) => {
         debugger;
-        const { token } = response;
+        const { token } = apiResponse.data;
         if (this.rememberMe) {          
           this.tokenService.setToken(token);
+          const role = this.tokenService.getRoleFromToken();
           debugger;
           this.userService.getUserDetail(token).subscribe({
             next: (response: any) => {
@@ -116,7 +110,7 @@ export class LoginComponent implements OnInit{
             },
             error: (error: any) => {
               debugger;
-              alert(error.error.message);
+              
             }
           })
         }                        
@@ -126,7 +120,8 @@ export class LoginComponent implements OnInit{
       },
       error: (error: any) => {
         debugger;
-        alert(error.error.message);
+        this.loginError = "Đăng nhập thất bại. Vui lòng thử lại.";
+        console.log(error);
       }
     });
   }

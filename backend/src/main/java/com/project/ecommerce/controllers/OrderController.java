@@ -1,7 +1,8 @@
 package com.project.ecommerce.controllers;
 
 import com.project.ecommerce.components.SecurityUtils;
-import com.project.ecommerce.dtos.*;
+import com.project.ecommerce.dtos.order.OrderDTO;
+import com.project.ecommerce.exceptions.DataNotFoundException;
 import com.project.ecommerce.models.Order;
 import com.project.ecommerce.models.User;
 import com.project.ecommerce.responses.*;
@@ -29,75 +30,69 @@ public class OrderController {
     private final SecurityUtils securityUtils;
     @PostMapping("")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<?> createOrder(
-            @Valid @RequestBody OrderDTO orderDTO,
-            BindingResult result
+    public ResponseEntity<ResponseObject> createOrder(
+            @Valid @RequestBody OrderDTO orderDTO
     ) {
-        try {
-            if(result.hasErrors()) {
-                List<String> errorMessages = result.getFieldErrors()
-                        .stream()
-                        .map(FieldError::getDefaultMessage)
-                        .toList();
-                return ResponseEntity.badRequest().body(errorMessages);
-            }
-            Order orderResponse = orderService.createOrder(orderDTO);
-            return ResponseEntity.ok(orderResponse);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        Order orderResponse = orderService.createOrder(orderDTO);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.OK)
+                .message("Success!")
+                .data(OrderResponse.fromOrder(orderResponse))
+                .build());
     }
-    @GetMapping("/user") // Thêm biến đường dẫn "user_id"
-    //GET http://localhost:8088/api/v1/orders/user?status=&keyword=
-    public ResponseEntity<?> getOrders(
+    @GetMapping("/user")
+    //GET http://localhost:8089/api/v1/orders/user?status=&keyword=
+    public ResponseEntity<ResponseObject> getOrders(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String status
     ) {
-        try {
-            User loggedUser = securityUtils.getLoggedInUser();
-            Long userId = loggedUser.getId();
-            List<OrderResponse> orders = orderService.findOrders(userId, status, keyword);
-            return ResponseEntity.ok(orders);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        User loggedUser = securityUtils.getLoggedInUser();
+        Long userId = loggedUser.getId();
+        List<OrderResponse> orders = orderService.findOrders(userId, status, keyword);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.OK)
+                .message("Success!")
+                .data(orders)
+                .build());
     }
     //GET http://localhost:8088/api/v1/orders/2
     @GetMapping("/{id}")
-    @PostAuthorize("hasRole('ROLE_ADMIN') or returnObject.body.userId == authentication.principal.id")
-    public ResponseEntity<?> getOrder(@Valid @PathVariable("id") Long orderId) {
-        try {
-            Order existingOrder = orderService.getOrderById(orderId);
-            OrderResponse orderResponse = OrderResponse.fromOrder(existingOrder);
-            return ResponseEntity.ok(orderResponse);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PostAuthorize("hasRole('ROLE_ADMIN') or returnObject.body.data.userId == authentication.principal.id")
+    public ResponseEntity<ResponseObject> getOrder(@Valid @PathVariable("id") Long orderId) {
+        Order existingOrder = orderService.getOrderById(orderId);
+        OrderResponse orderResponse = OrderResponse.fromOrder(existingOrder);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.OK)
+                .message("Success!")
+                .data(orderResponse).build());
     }
     @PutMapping("/{id}")
     //PUT http://localhost:8088/api/v1/orders/2
-    //công việc của admin
-    public ResponseEntity<?> updateOrder(
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ResponseObject> updateOrder(
             @Valid @PathVariable long id,
             @Valid @RequestBody OrderDTO orderDTO) {
 
-        try {
-            Order order = orderService.updateOrder(id, orderDTO);
-            return ResponseEntity.ok(order);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        Order order = orderService.updateOrder(id, orderDTO);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.OK)
+                .message("Update Success!")
+                .data(order)
+                .build());
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOrder(@Valid @PathVariable Long id) {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ResponseObject> deleteOrder(@Valid @PathVariable Long id) {
         //xóa mềm => cập nhật trường active = false
         orderService.deleteOrder(id);
-        String result = MessageKeys.DELETE_ORDER_SUCCESSFULLY;
-        return ResponseEntity.ok().body(result);
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .status(HttpStatus.OK)
+                .message(MessageKeys.DELETE_ORDER_SUCCESSFULLY)
+                .build());
     }
     @GetMapping("")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<OrderListResponse> getOrdersByKeyword(
+    public ResponseEntity<ResponseObject> getOrdersByKeyword(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit
@@ -115,9 +110,12 @@ public class OrderController {
         // Lấy tổng số trang
         int totalPages = orderPage.getTotalPages();
         List<OrderResponse> orderResponses = orderPage.getContent();
-        return ResponseEntity.ok(OrderListResponse.builder()
+        OrderListResponse orderListResponse = OrderListResponse.builder()
                 .totalPages(totalPages)
-                .orders(orderResponses)
+                .orders(orderResponses).build();
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.OK)
+                .data(orderListResponse)
                 .build());
     }
 
@@ -125,12 +123,12 @@ public class OrderController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<ResponseObject> updateOrderStatus(
             @Valid @PathVariable Long id,
-            @RequestParam String status) throws Exception {
+            @RequestParam String status) {
         // Gọi service để cập nhật trạng thái
         Order updatedOrder = orderService.updateOrderStatus(id, status);
         // Trả về phản hồi thành công
         return ResponseEntity.ok(ResponseObject.builder()
-                .message("Order status updated successfully")
+                .message("Order status updated successfully!")
                 .status(HttpStatus.OK)
                 .data(OrderResponse.fromOrder(updatedOrder))
                 .build());

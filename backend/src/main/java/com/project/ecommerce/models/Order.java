@@ -32,9 +32,6 @@ public class Order {
     @Column(name = "phone_number",nullable = false, length = 100)
     private String phoneNumber;
 
-    @Column(name = "address", length = 100)
-    private String address;
-
     @Column(name = "note", length = 100)
     private String note;
 

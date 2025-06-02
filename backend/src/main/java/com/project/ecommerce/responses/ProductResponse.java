@@ -3,10 +3,11 @@ package com.project.ecommerce.responses;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.ecommerce.models.Product;
 import com.project.ecommerce.models.ProductImage;
+import com.project.ecommerce.models.ProductVariant;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -20,7 +21,10 @@ public class ProductResponse extends BaseResponse{
     private String thumbnail;
     private String description;
     @JsonProperty("product_images")
-    private List<ProductImage> productImages = new ArrayList<>();
+    private Set<ProductImage> productImages = new HashSet<>();
+
+    @JsonProperty("product_variants")
+    private Set<ProductVariant> variants = new HashSet<>();
 
     @JsonProperty("category_id")
     private Long categoryId;
@@ -33,6 +37,7 @@ public class ProductResponse extends BaseResponse{
                 .description(product.getDescription())
                 .categoryId(product.getCategory().getId())
                 .productImages(product.getProductImages())
+                .variants(product.getProductVariants())
                 .build();
         productResponse.setCreatedAt(product.getCreatedAt());
         productResponse.setUpdatedAt(product.getUpdatedAt());

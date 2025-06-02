@@ -13,6 +13,9 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PaymentService } from 'src/app/services/payment.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiResponse } from 'src/app/responses/api.response';
+import { ProductVariantService } from 'src/app/services/product.variant.service';
+import { ProductVariant } from 'src/app/models/product.variants';
+import { VariantResponse } from 'src/app/responses/variant/variant.response';
 
 @Component({
   selector: 'app-order',
@@ -21,9 +24,8 @@ import { ApiResponse } from 'src/app/responses/api.response';
 })
 export class OrderComponent implements OnInit{
   orderForm: FormGroup; // Đối tượng FormGroup để quản lý dữ liệu của form
-  cartItems: { product: Product, quantity: number }[] = [];
-  couponCode: string = ''; // Mã giảm giá
-  totalAmount: number = 0; // Tổng tiền
+  cartItems: { variant: VariantResponse, quantity: number }[] = [];
+  totalAmount: number = 0;
   cart: Map<number, number> = new Map();
   
   orderData: OrderDTO = {
@@ -31,23 +33,23 @@ export class OrderComponent implements OnInit{
     fullname: '', // Khởi tạo rỗng, sẽ được điền từ form
     email: '', // Khởi tạo rỗng, sẽ được điền từ form    
     phone_number: '', // Khởi tạo rỗng, sẽ được điền từ form
-    address: '', // Khởi tạo rỗng, sẽ được điền từ form
+    shipping_address: '', // Khởi tạo rỗng, sẽ được điền từ form
     status: 'pending',
+    order_date: new Date(),
     note: '', // Có thể thêm trường ghi chú nếu cần
     total_money: 0, // Sẽ được tính toán dựa trên giỏ hàng và mã giảm giá
     payment_method: 'cod', // Mặc định là thanh toán khi nhận hàng (COD)
     shipping_method: 'express', // Mặc định là vận chuyển nhanh (Express)
-    coupon_code: '', // Sẽ được điền từ form khi áp dụng mã giảm giá
     cart_items: []
   };
 
   constructor(
     private cartService: CartService,
     private productService: ProductService,
+    private variantService: ProductVariantService,
     private orderService: OrderService,
     private tokenService: TokenService,
     private formBuilder: FormBuilder,
-    private activatedRoute: ActivatedRoute,
     private router: Router,
     private toastService: ToastService,
     private paymentService: PaymentService
@@ -57,7 +59,7 @@ export class OrderComponent implements OnInit{
       fullname: ['', Validators.required], // fullname là FormControl bắt buộc      
       email: ['', [Validators.email]], // Sử dụng Validators.email cho kiểm tra định dạng email
       phone_number: ['', [Validators.required, Validators.minLength(6)]], // phone_number bắt buộc và ít nhất 6 ký tự
-      address: ['', [Validators.required, Validators.minLength(5)]], // address bắt buộc và ít nhất 5 ký tự
+      shipping_address: ['', [Validators.required, Validators.minLength(5)]], // address bắt buộc và ít nhất 5 ký tự
       note: [''],
       shipping_method: ['express'],
       payment_method: ['cod']
@@ -71,29 +73,30 @@ export class OrderComponent implements OnInit{
     // Lấy danh sách sản phẩm từ giỏ hàng
     debugger
     this.cart = this.cartService.getCart();
-    const productIds = Array.from(this.cart.keys()); // Chuyển danh sách ID từ Map giỏ hàng    
+    const variantIds = Array.from(this.cart.keys()); // Chuyển danh sách ID từ Map giỏ hàng    
 
     // Gọi service để lấy thông tin sản phẩm dựa trên danh sách ID
     debugger    
-    if(productIds.length === 0) {
+    if(variantIds.length === 0) {
       return;
-    }    
-    this.productService.getProductsByIds(productIds).subscribe({
-      next: (products) => {            
+    }  
+    this.variantService.getVariantsByIds(variantIds).subscribe({
+      next: (apiResponse: ApiResponse) => {            
         debugger
-        // Lấy thông tin sản phẩm và số lượng từ danh sách sản phẩm và giỏ hàng
-        this.cartItems = productIds.map((productId) => {
+        // Lấy thông tin sản phẩm và số lượng từ danh sách sản phẩm và giỏ hàng   
+        const variants = apiResponse.data;     
+        this.cartItems = variantIds.map((variantId) => {
           debugger
-          const product = products.find((p) => p.id === productId);
-          if (product) {
-            product.thumbnail = `${environment.apiBaseUrl}/products/images/${product.thumbnail}`;
+          const variant = variants.find((v: { id: number; }) => v.id === variantId)
+          if (variant) {
+            variant.thumbnail = `${environment.apiBaseUrl}/products/images/${variant.thumbnail}`;
           }          
           return {
-            product: product!,
-            quantity: this.cart.get(productId)!
+            variant: variant!,
+            quantity: this.cart.get(variantId)!
           };
         });
-        console.log('haha');
+
       },
       complete: () => {
         debugger;
@@ -103,7 +106,7 @@ export class OrderComponent implements OnInit{
         debugger;
         console.error('Error fetching detail:', error);
       }
-    });        
+    });          
   }
   placeOrder() {
     debugger
@@ -113,14 +116,13 @@ export class OrderComponent implements OnInit{
         ...this.orderForm.value
       };
       this.orderData.cart_items = this.cartItems.map(cartItem => ({
-        product_id: cartItem.product.id,
+        variant_id: cartItem.variant.id,
         quantity: cartItem.quantity
       }));
       this.orderData.total_money =  this.totalAmount;
-      // Dữ liệu hợp lệ, bạn có thể gửi đơn hàng đi
   
     // Kiểm tra: Nếu payment_method = 'vnpay' => Gọi createPaymentUrl, 
-      // ngược lại => placeOrder
+    // ngược lại => placeOrder
     if (this.orderData.payment_method === 'vnpay') {
       debugger
       const amount = this.orderData.total_money || 0;
@@ -141,8 +143,8 @@ export class OrderComponent implements OnInit{
               ...this.orderData,
               vnp_txn_ref: vnp_TxnRef
             }).subscribe({
-              next: (placeOrderResponse: Order) => {
-                // Bước 4: Nếu đặt hàng thành công, điều hướng sang trang thanh toán VNPAY
+              next: (apiResponse: ApiResponse) => {
+            // Bước 4: Nếu đặt hàng thành công, điều hướng sang trang thanh toán VNPAY
                 debugger
                 window.location.href = paymentUrl;
               },
@@ -168,9 +170,13 @@ export class OrderComponent implements OnInit{
       debugger
       // Chọn COD => Gọi this.orderService.placeOrder
       this.orderService.placeOrder(this.orderData).subscribe({
-        next: (response: Order) => {
+        next: (apiResponse: ApiResponse) => {
           debugger
-          console.log('Đặt hàng COD thành công!', response);
+          this.toastService.showToast({
+            error: null,
+            defaultMsg: 'Đặt hàng thành công!',
+            title: 'Thành Công'
+          });
           // Xoá giỏ hàng, về trang chủ
           this.cartService.clearCart();
           this.router.navigate(['/']);
@@ -215,8 +221,7 @@ export class OrderComponent implements OnInit{
   // Hàm tính tổng tiền
   calculateTotal(): void {
       this.totalAmount = this.cartItems.reduce(
-          (total, item) => total + item.product.price * item.quantity,
-          0
+          (total, item) => total + item.variant.price * item.quantity, 0
       );
   }
   confirmDelete(index: number): void {
@@ -227,15 +232,11 @@ export class OrderComponent implements OnInit{
     // Tính toán lại tổng tiền
     this.calculateTotal();
   }
-  // Hàm xử lý việc áp dụng mã giảm giá
-  applyCoupon(): void {
-      // Viết mã xử lý áp dụng mã giảm giá ở đây
-      // Cập nhật giá trị totalAmount dựa trên mã giảm giá nếu áp dụng
-  }
+
   private updateCartFromCartItems(): void {
     this.cart.clear();
     this.cartItems.forEach((item) => {
-      this.cart.set(item.product.id, item.quantity);
+      this.cart.set(item.variant.id, item.quantity);
     });
     this.cartService.setCart(this.cart);
   }

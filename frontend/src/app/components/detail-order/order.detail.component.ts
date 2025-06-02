@@ -4,10 +4,12 @@ import { environment } from '../../../environments/environment';
 import { OrderDetail } from '../../models/order.detail';
 import { FooterComponent } from '../footer/footer.component';
 import { HeaderComponent } from '../header/header.component';
-import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { OrderService } from 'src/app/services/order.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ApiResponse } from 'src/app/responses/api.response';
+import { ToastService } from 'src/app/services/toast.service';
 @Component({
     selector: 'app-order-detail',
     templateUrl: './order.detail.component.html',
@@ -20,7 +22,6 @@ export class OrderDetailComponent implements OnInit {
     fullname: '',
     phone_number: '',
     email: '',
-    address: '',
     note: '',
     order_date: new Date(),
     status: '',
@@ -35,6 +36,8 @@ export class OrderDetailComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private router: Router,
+    private toastService: ToastService,
+    private location: Location,
     private route: ActivatedRoute
   ){
   }
@@ -47,7 +50,8 @@ export class OrderDetailComponent implements OnInit {
     debugger
     const orderId = Number(this.route.snapshot.paramMap.get('orderId'));
     this.orderService.getOrderById(orderId).subscribe({
-      next: (response: any) => {        
+      next: (apiResponse: ApiResponse) => {    
+        const response = apiResponse.data;    
         this.orderResponse = {
           ...response,
           order_details: response.order_details.map((detail: OrderDetail) => ({
@@ -72,11 +76,45 @@ export class OrderDetailComponent implements OnInit {
     const statusMap: { [key: string]: string } = {
       'pending': 'Chờ duyệt',
       'shipping': 'Đang vận chuyển',
+      'processing': 'Chờ lấy hàng',
       'delivered': 'Hoàn thành',
-      'canceled': 'Đã hủy',
+      'cancelled': 'Đã hủy',
       'returned': 'Hoàn hàng'
     };
     return statusMap[status] || 'Không xác định';
+  }
+
+  cancelOrder (status: string) {
+
+    let confirmed = "";
+    let message = "";
+    if( status === 'returned'){
+      confirmed = "Bạn có chắc chắn muốn hoàn hàng!";
+      message = "Hoàn hàng thành công!"
+    } else {
+      confirmed = "Bạn có chắc chắn huỷ đơn hàng!";
+      message = "Huỷ đơn thành công!"
+    }
+
+    if(confirm(confirmed)){
+      this.orderService.updateOrderStatus(this.orderResponse.id, status).subscribe({
+        next: (response: ApiResponse) => {
+          this.toastService.showToast({
+            error: null,
+            defaultMsg: message,
+            title: 'Thành Công'
+          });
+          this.location.back()
+        },
+        error: (error: HttpErrorResponse) => {
+          this.toastService.showToast({
+            error: error,
+            defaultMsg: 'Lỗi',
+            title: 'Lỗi'
+          });
+        }
+      });
+    }
   }
 }
 

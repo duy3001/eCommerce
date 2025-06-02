@@ -1,13 +1,13 @@
 package com.project.ecommerce.services.orderDetail;
 
-import com.project.ecommerce.dtos.OrderDetailDTO;
+import com.project.ecommerce.dtos.order.OrderDetailDTO;
 import com.project.ecommerce.exceptions.DataNotFoundException;
 import com.project.ecommerce.models.Order;
 import com.project.ecommerce.models.OrderDetail;
-import com.project.ecommerce.models.Product;
+import com.project.ecommerce.models.ProductVariant;
 import com.project.ecommerce.repositories.OrderDetailRepository;
 import com.project.ecommerce.repositories.OrderRepository;
-import com.project.ecommerce.repositories.ProductRepository;
+import com.project.ecommerce.repositories.VariantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,54 +19,52 @@ import java.util.List;
 public class OrderDetailService implements IOrderDetailService{
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
-    private final ProductRepository productRepository;
+    private final VariantRepository variantRepository;
     @Override
     @Transactional
-    public OrderDetail createOrderDetail(OrderDetailDTO orderDetailDTO) throws Exception {
+    public OrderDetail createOrderDetail(OrderDetailDTO orderDetailDTO) {
         //tìm xem orderId có tồn tại ko
         Order order = orderRepository.findById(orderDetailDTO.getOrderId())
                 .orElseThrow(() -> new DataNotFoundException(
-                        "Cannot find Order with id : "+orderDetailDTO.getOrderId()));
+                        "Cannot find Order with id : " + orderDetailDTO.getOrderId()));
         // Tìm Product theo id
-        Product product = productRepository.findById(orderDetailDTO.getProductId())
+        ProductVariant variant = variantRepository.findById(orderDetailDTO.getVariantId())
                 .orElseThrow(() -> new DataNotFoundException(
-                        "Cannot find product with id: " + orderDetailDTO.getProductId()));
+                        "Cannot find product with id: " + orderDetailDTO.getVariantId()));
         OrderDetail orderDetail = OrderDetail.builder()
                 .order(order)
-                .product(product)
+                .productVariant(variant)
                 .numberOfProducts(orderDetailDTO.getNumberOfProducts())
                 .price(orderDetailDTO.getPrice())
                 .totalMoney(orderDetailDTO.getTotalMoney())
-                .color(orderDetailDTO.getColor())
                 .build();
         //lưu vào db
         return orderDetailRepository.save(orderDetail);
     }
 
     @Override
-    public OrderDetail getOrderDetail(Long id) throws DataNotFoundException {
+    public OrderDetail getOrderDetail(Long id) {
         return orderDetailRepository.findById(id)
-                .orElseThrow(()->new DataNotFoundException("Cannot find OrderDetail with id: "+id));
+                .orElseThrow(()->new DataNotFoundException("Cannot find OrderDetail with id: " + id));
     }
 
     @Override
     @Transactional
     public OrderDetail updateOrderDetail(Long id, OrderDetailDTO orderDetailDTO)
             throws DataNotFoundException {
-        //tìm xem order detail có tồn tại ko đã
+        //tìm xem order detail có tồn tại ko
         OrderDetail existingOrderDetail = orderDetailRepository.findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Cannot find order detail with id: "+id));
+                .orElseThrow(() -> new DataNotFoundException("Cannot find order detail with id: " + id));
         Order existingOrder = orderRepository.findById(orderDetailDTO.getOrderId())
-                .orElseThrow(() -> new DataNotFoundException("Cannot find order with id: "+id));
-        Product existingProduct = productRepository.findById(orderDetailDTO.getProductId())
+                .orElseThrow(() -> new DataNotFoundException("Cannot find order with id: " + id));
+        ProductVariant existingProduct = variantRepository.findById(orderDetailDTO.getVariantId())
                 .orElseThrow(() -> new DataNotFoundException(
-                        "Cannot find product with id: " + orderDetailDTO.getProductId()));
+                        "Cannot find product with id: " + orderDetailDTO.getVariantId()));
         existingOrderDetail.setPrice(orderDetailDTO.getPrice());
         existingOrderDetail.setNumberOfProducts(orderDetailDTO.getNumberOfProducts());
         existingOrderDetail.setTotalMoney(orderDetailDTO.getTotalMoney());
-        existingOrderDetail.setColor(orderDetailDTO.getColor());
         existingOrderDetail.setOrder(existingOrder);
-        existingOrderDetail.setProduct(existingProduct);
+        existingOrderDetail.setProductVariant(existingProduct);
         return orderDetailRepository.save(existingOrderDetail);
     }
 

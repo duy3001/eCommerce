@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Location } from '@angular/common';
+import { forkJoin } from 'rxjs';
 import { Product } from '../../../../models/product';
 import { Category } from '../../../../models/category';
 import { ProductService } from '../../../../services/product.service';
@@ -8,6 +8,9 @@ import { CategoryService } from '../../../../services/category.service';
 import { environment } from '../../../../../environments/environment';
 import { ProductImage } from '../../../../models/product.image';
 import { UpdateProductDTO } from '../../../../dtos/product/update.product.dto';
+import { ProductVariantService } from 'src/app/services/product.variant.service';
+import { ToastService } from 'src/app/services/toast.service';
+import { ApiResponse } from 'src/app/responses/api.response';
 
 @Component({
   selector: 'app-detail.product.admin',
@@ -27,8 +30,9 @@ export class UpdateProductAdminComponent implements OnInit {
     private productService: ProductService,
     private route: ActivatedRoute,
     private router: Router,
-    private categoryService: CategoryService,    
-    private location: Location,
+    private categoryService: CategoryService,  
+    private productVariantService: ProductVariantService ,
+    private toastService: ToastService,
   ) {
     this.productId = 0;
     this.product = {} as Product;
@@ -42,17 +46,15 @@ export class UpdateProductAdminComponent implements OnInit {
     });
     this.getCategories(1, 100);
     this.getProductDetails();
-
-    
     console.log(this.currentImageIndex);
     console.log(this.product);
     
   }
   getCategories(page: number, limit: number) {
     this.categoryService.getCategories(page, limit).subscribe({
-      next: (categories: Category[]) => {
+      next: (apiresponse: ApiResponse) => {
         debugger
-        this.categories = categories;
+        this.categories = apiresponse.data;
       },
       complete: () => {
         debugger;
@@ -64,28 +66,31 @@ export class UpdateProductAdminComponent implements OnInit {
   }
   getProductDetails(): void {
     this.productService.getDetailProduct(this.productId).subscribe({
-      next: (product: Product) => {
-        this.product = product;
-        this.updatedProduct = { ...product };                
+      next: (apiResponse: ApiResponse) => {
+        this.product = apiResponse.data;
+        this.updatedProduct = { ...apiResponse.data };                
         this.updatedProduct.product_images.forEach((product_image:ProductImage) => {
           product_image.image_url = `${environment.apiBaseUrl}/products/images/${product_image.image_url}`;
         
         });
-        this.currentImageIndex = this.product.product_images.findIndex(
+        this.currentImageIndex = this.updatedProduct.product_images.findIndex(
           (product_image) => 
-            this.product.thumbnail === product_image.image_url.split("images/")[1]
+            this.updatedProduct.thumbnail === product_image.image_url.split("images/")[1]
         );
       },
       complete: () => {
         
       },
       error: (error: any) => {
-        
+        this.toastService.showToast({
+          error: error,
+          defaultMsg: 'Lỗi tải chi tiết sản phẩm',
+          title: 'Lỗi Hệ Thống'
+        });
       }
     });     
   }
   updateProduct() {
-    // Implement your update logic here
     const updateProductDTO: UpdateProductDTO = {
       name: this.updatedProduct.name,
       price: this.updatedProduct.price,
@@ -98,11 +103,19 @@ export class UpdateProductAdminComponent implements OnInit {
         debugger        
       },
       complete: () => {
-        debugger;
+        this.toastService.showToast({
+          error: null,
+          defaultMsg: 'Cập nhật sản phẩm thành công!',
+          title: 'Thành Công'
+        });
         this.router.navigate(['/admin/products']);        
       },
       error: (error: any) => {
-        debugger;
+        this.toastService.showToast({
+          error: 'Cập nhật thất bại',
+          defaultMsg: '',
+          title: 'Lỗi'
+        });
         console.error('Error fetching products:', error);
       }
     });  
@@ -139,8 +152,8 @@ export class UpdateProductAdminComponent implements OnInit {
     // Retrieve selected files from input element
     const files = event.target.files;
     // Limit the number of selected files to 5
-    if (files.length > 5) {
-      alert('Please select a maximum of 5 images.');
+    if (files.length > 6) {
+      alert('Please select a maximum of 6 images.');
       return;
     }
     // Store the selected files in the newProduct object
@@ -175,5 +188,68 @@ export class UpdateProductAdminComponent implements OnInit {
         }
       });
     }   
+  }
+
+  removeVariant(variantId: number | undefined) {
+    // this.updatedProduct.product_variants.splice(index, 1);
+    if (!variantId) {
+      // Chỉ cần xoá khỏi UI (mảng product_variants)
+      this.updatedProduct.product_variants = this.updatedProduct.product_variants.filter(v => v.id !== variantId);
+      return;
+    }
+
+    this.productVariantService.deleteVariants(variantId).subscribe({
+      next:() => {
+         debugger
+         this.updatedProduct.product_variants = this.updatedProduct.product_variants.filter(v => v.id !== variantId);
+      }, complete: () => {
+        this.toastService.showToast({
+          error: null,
+          defaultMsg: 'Xoá thành công!',
+          title: 'Thành Công'
+        }); 
+        this.router.navigate(['/admin/products/update', this.productId]);
+      },      
+      error: (error) => {
+        // Handle the error while uploading images
+        alert(error.error)
+        console.error('Error deleting variant:', error);
+      }
+
+    });
+    
+  }
+
+  addVariant() {
+    this.updatedProduct.product_variants.push({ id: 0, variant: '', stock: 0, product_id: this.productId });
+  }
+
+  saveVariants() {
+    const newVariants = this.updatedProduct.product_variants.filter(variant => !variant.id || variant.id === 0);
+
+    if (!newVariants.length) {
+      alert("Không có biến thể mới để lưu!");
+      return;
+    }
+
+    const insertRequests = newVariants.map(variant => {
+      const insertVariantDTO = {
+        variant: variant.variant,
+        stock: variant.stock
+      };
+      return this.productVariantService.insertVariants(this.productId, insertVariantDTO);
+    });
+  
+    forkJoin(insertRequests).subscribe({
+      next: (responses) => {
+        
+      },
+      error: (error) => {
+        console.error("Lỗi khi thêm biến thể:", error);
+        alert("Đã xảy ra lỗi khi thêm biến thể.");
+      }
+    });
+    window.location.reload();
+    alert("Biến thể mới đã được lưu!");
   }
 }

@@ -3,6 +3,7 @@ import {
     IsNotEmpty, 
     IsPhoneNumber,     
 } from 'class-validator';
+import { InsertVariantDTO } from '../variant/insert.variant.dto';
 
 export class InsertProductDTO {
     @IsPhoneNumber()
@@ -16,6 +17,7 @@ export class InsertProductDTO {
 
     category_id: number;
     images: File[] = [];
+    variants: InsertVariantDTO[] = [];
     
     constructor(data: any) {
         this.name = data.name;

@@ -15,11 +15,14 @@ public class OrderDetailResponse {
     @JsonProperty("order_id")
     private Long orderId;
 
-    @JsonProperty("product_id")
-    private Long productId;
+    @JsonProperty("variant_id")
+    private Long variantId;
 
     @JsonProperty("product_name")
     private String productName;
+
+    @JsonProperty("variant_name")
+    private String variantName;
 
     @JsonProperty("thumbnail")
     private String thumbnail;
@@ -33,20 +36,19 @@ public class OrderDetailResponse {
     @JsonProperty("total_money")
     private Float totalMoney;
 
-    private String color;
 
     public static OrderDetailResponse fromOrderDetail(OrderDetail orderDetail) {
         return OrderDetailResponse
                 .builder()
                 .id(orderDetail.getId())
                 .orderId(orderDetail.getOrder().getId())
-                .productId(orderDetail.getProduct().getId())
-                .productName(orderDetail.getProduct().getName())
-                .thumbnail(orderDetail.getProduct().getThumbnail())
+                .variantId(orderDetail.getProductVariant().getId())
+                .variantName(orderDetail.getProductVariant().getVariant())
+                .productName(orderDetail.getProductVariant().getProduct().getName())
+                .thumbnail(orderDetail.getProductVariant().getProduct().getThumbnail())
                 .price(orderDetail.getPrice())
                 .numberOfProducts(orderDetail.getNumberOfProducts())
                 .totalMoney(orderDetail.getTotalMoney())
-                .color(orderDetail.getColor())
                 .build();
     }
 }

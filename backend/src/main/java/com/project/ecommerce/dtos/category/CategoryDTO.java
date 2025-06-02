@@ -1,4 +1,4 @@
-package com.project.ecommerce.dtos;
+package com.project.ecommerce.dtos.category;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;

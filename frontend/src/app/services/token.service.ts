@@ -23,8 +23,14 @@ export class TokenService {
         let userObject = this.jwtHelperService.decodeToken(token);
         return 'userId' in userObject ? parseInt(userObject['userId']) : 0;
     }
-    
-      
+
+    getRoleFromToken(): string | null {
+        const token = localStorage.getItem('access_token'); 
+        if (!token) return null;
+
+        const decodedToken = this.jwtHelperService.decodeToken(token);
+        return decodedToken?.role || null;
+    }      
     removeToken(): void {
         localStorage.removeItem(this.TOKEN_KEY);
     }              

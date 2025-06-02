@@ -2,10 +2,10 @@ server:
   port: 8089
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/shopapp2?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: ${MYSQL_ROOT_PASSWORD:Hoangduy@123}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=e_com}
+    driver-class-name: org.postgresql.Driver
+    username: ${DBMS_USERNAME:postgres}
+    password: ${DBMS_PASSWORD:30011211}
   jpa:
     show-sql: true
     hibernate:
@@ -13,7 +13,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-      dialect: org.hibernate.dialect.MySQL8Dialect
+      dialect: org.hibernate.dialect.PostgreSQLDialect
 
   servlet:
     multipart:
@@ -31,11 +31,14 @@ logging:
     org:
       springframework:
         security: DEBUG
-
+      hibernate:
+        SQL: DEBUG
+    com:
+      project:
+        ecommerce=DEBUG:
 vnpay:
   pay-url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
   return-url: "${VNPAY_RETURN_URI:http://localhost:4200/payments/payment-callback}"
   tmn-code: "1AFGVYUH" # Add your TMN code here
   secret-key: "45I9OY4MVOJO00CM9TA4S8X773RAKKXB" # Add your secret key here
   api-url: "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction"
-

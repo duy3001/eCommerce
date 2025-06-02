@@ -45,7 +45,7 @@ export class PaymentCallbackComponent implements OnInit {
 
   handlePaymentSuccess(orderId: number): void {    
 
-    this.orderService.updateOrderStatus(orderId, 'processing').subscribe({
+    this.orderService.updateOrderStatus(orderId, 'pending').subscribe({
       next: (response: ApiResponse) => {
         this.loading = false;
         this.paymentSuccess = true;

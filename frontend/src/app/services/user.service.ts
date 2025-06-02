@@ -7,6 +7,8 @@ import { environment } from '../../environments/environment';
 import { HttpUtilService } from './http.util.service';
 import { UserResponse } from '../responses/user/user.response';
 import { UpdateUserDTO } from '../dtos/user/update.user.dto';
+import { ApiResponse } from '../responses/api.response';
+import { ChangePasswordDTO } from '../dtos/user/change.password.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +17,7 @@ export class UserService {
   private apiRegister = `${environment.apiBaseUrl}/users/register`;
   private apiLogin = `${environment.apiBaseUrl}/users/login`;
   private apiUserDetail = `${environment.apiBaseUrl}/users/details`;
+  private apiBaseUrl = environment.apiBaseUrl;
 
   private apiConfig = {
     headers: this.httpUtilService.createHeaders(),
@@ -32,24 +35,26 @@ export class UserService {
   login(loginDTO: LoginDTO): Observable<any> {    
     return this.http.post(this.apiLogin, loginDTO, this.apiConfig);
   }
-  getUserDetail(token: string) {
-    return this.http.post(this.apiUserDetail, {
+  
+  getUserDetail(token: string): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(this.apiUserDetail, null, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       })
-    })
+    });
   }
-  updateUserDetail(token: string, updateUserDTO: UpdateUserDTO) {
-    debugger
+
+  updateUserDetail(token: string, updateUserDTO: UpdateUserDTO): Observable<ApiResponse>  {
     let userResponse = this.getUserResponseFromLocalStorage();        
-    return this.http.put(`${this.apiUserDetail}/${userResponse?.id}`,updateUserDTO,{
+    return this.http.put<ApiResponse>(`${this.apiUserDetail}/${userResponse?.id}`,updateUserDTO,{
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       })
     })
   }
+  
   saveUserResponseToLocalStorage(userResponse?: UserResponse) {
     try {
       debugger
@@ -94,5 +99,10 @@ export class UserService {
   getUsers(params: { page: number, limit: number, keyword: string }): Observable<any> {
     const url = `${environment.apiBaseUrl}/users`;
     return this.http.get<any>(url, { params: params });
+  }
+
+  changePassword(userId: number, requestDTO: ChangePasswordDTO) : Observable<ApiResponse> {
+
+    return this.http.put<ApiResponse>(`${this.apiBaseUrl}/users/change-password/${userId}`, requestDTO)
   }
 }

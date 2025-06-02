@@ -29,9 +29,6 @@ public class OrderResponse {
     @JsonProperty("email")
     private String email;
 
-    @JsonProperty("address")
-    private String address;
-
     @JsonProperty("note")
     private String note;
 
@@ -49,7 +46,7 @@ public class OrderResponse {
     private String shippingMethod = "";
 
     @JsonProperty("shipping_address")
-    private String shippingAddress = "";
+    private String shippingAddress;
 
     @JsonProperty("shipping_date")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "UTC")
@@ -73,7 +70,6 @@ public class OrderResponse {
                 .fullName(order.getFullName())
                 .phoneNumber(order.getPhoneNumber())
                 .email(order.getEmail())
-                .address(order.getAddress())
                 .note(order.getNote())
                 .orderDate(order.getOrderDate().atStartOfDay())
                 .status(order.getStatus())

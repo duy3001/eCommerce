@@ -45,8 +45,6 @@ public class UserResponse {
                 .address(user.getAddress())
                 .active(user.isActive())
                 .dateOfBirth(user.getDateOfBirth())
-                .facebookAccountId(user.getFacebookAccountId())
-                .googleAccountId(user.getGoogleAccountId())
                 .role(user.getRole())
                 .build();
     }

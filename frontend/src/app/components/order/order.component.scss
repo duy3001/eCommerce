@@ -3,14 +3,17 @@
 .container {
     color: white;
 }
+
 .intro-section {
     color: black;
     padding: 20px;
     text-align: center;
 }
+
 .product-header {
     color: $shopapp-tint-color;
 }
+
 .form-control {
     background-color: white;
     border: 1px solid rgb(29, 33, 54);
@@ -21,15 +24,19 @@
     border-color: white;
     background-color: $shopapp-background-color;
 }
+
 .form-label {
     color: black;
 }
+
 .product-header {
     color: black;
 }
+
 .product-order {
     color: black;
 }
+
 table {
     width: 100%;
     border-radius: 10px;
@@ -37,7 +44,7 @@ table {
     border-collapse: separate;
     border: 1px solid black;
     border-spacing: 0;
-    background-color: $shopapp-background-color;    
+    background-color: $shopapp-background-color;
 }
 
 th,
@@ -45,21 +52,22 @@ td {
     padding: 10px;
     text-align: center;
 }
+
 .product-info {
     display: flex;
     align-items: center;
 }
 
 .product-image {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     border-radius: 5px;
     margin-right: 10px;
 }
 
 .product-name {
     color: black;
-    margin-right: 10px;    
+    margin-right: 10px;
     text-align: left;
 }
 
@@ -72,6 +80,7 @@ td {
 
 .border-wrapper {
     border: 1px solid black;
+    border-radius: 3px;
 }
 
 .product-quantity {
@@ -90,16 +99,6 @@ td {
     cursor: pointer;
 }
 
-.product-quantity input {
-    background-color: transparent;
-    border: none;
-    color: black;
-    font-size: 16px;
-    text-align: center;
-    width: 40px;
-    margin: 0 10px;
-}
-
 .product-quantity input:focus {
     outline: none;
 }
@@ -107,7 +106,8 @@ td {
 .order-container {
     display: flex;
     flex-direction: column;
-    align-items: flex-end; /* Căn các phần tử về bên phải */
+    align-items: flex-end;
+    /* Căn các phần tử về bên phải */
     width: 100%;
     margin-top: 20px;
 }
@@ -119,9 +119,21 @@ td {
     border-radius: 8px;
     border: none;
     cursor: pointer;
-    margin-top: 10px; /* Tạo khoảng cách giữa tổng giá và nút */
+    margin-top: 10px;
+    /* Tạo khoảng cách giữa tổng giá và nút */
 }
 
 .order-button:hover {
     background-color: black;
+}
+
+.product-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-variant {
+    font-size: 14px;
+    color: gray;
+    text-align: left;
 }

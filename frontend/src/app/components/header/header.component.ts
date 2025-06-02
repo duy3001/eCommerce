@@ -6,6 +6,7 @@ import { TokenService } from '../../services/token.service';
 import { UserResponse } from '../../responses/user/user.response';
 import { Category } from 'src/app/models/category';
 import { CategoryService } from 'src/app/services/category.service';
+import { ApiResponse } from 'src/app/responses/api.response';
 
 @Component({
   selector: 'app-header',
@@ -63,9 +64,9 @@ export class HeaderComponent implements OnInit{
 
   getCategories(page: number, limit: number) {
     this.categoryService.getCategories(page, limit).subscribe({
-      next: (categories: Category[]) => {
+      next: (apiresponse: ApiResponse) => {
         debugger;
-        this.categories = categories;
+        this.categories = apiresponse.data;
       },
       complete: () => {
         debugger;

@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, CanActivateFn } from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateFn, CanMatchFn, Route, UrlSegment } from '@angular/router';
 import { Router } from '@angular/router'; // Đảm bảo bạn đã import Router ở đây.
 import { inject } from '@angular/core';
-import { of,Observable } from 'rxjs';
 import { UserService } from '../services/user.service';
 import { UserResponse } from '../responses/user/user.response';
 import { TokenService } from '../services/token.service';
@@ -22,23 +21,23 @@ export class AdminGuard {
     const isTokenExpired = this.tokenService.isTokenExpired();
     const isUserIdValid = this.tokenService.getUserId() > 0;
     this.userResponse = this.userService.getUserResponseFromLocalStorage();
-    const isAdmin = this.userResponse?.role.name == 'admin';
+    // const isAdmin = this.userResponse?.role.name === 'admin';
+    const role = this.tokenService.getRoleFromToken();
+    const isAdmin = role === 'admin';
     debugger
-    if (!isTokenExpired && isUserIdValid && isAdmin) {
+    if (!isTokenExpired && isUserIdValid && isAdmin ) {
       return true;
     } else {
-      // Nếu không authenticated, bạn có thể redirect hoặc trả về một UrlTree khác.
-      // Ví dụ trả về trang login:
+      // Nếu không authenticated, trả về trang login:
       this.router.navigate(['/login']);
       return false;
     }
   }  
 }
 
-export const AdminGuardFn: CanActivateFn = (
-  next: ActivatedRouteSnapshot, 
-  state: RouterStateSnapshot
+export const AdminGuardFn: CanActivateFn & CanMatchFn = (
+  route: ActivatedRouteSnapshot | Route, 
+  state: RouterStateSnapshot | UrlSegment[]
 ): boolean => {
-  debugger
-  return inject(AdminGuard).canActivate(next, state);
-}
+  return inject(AdminGuard).canActivate(route as any, state as any);
+};

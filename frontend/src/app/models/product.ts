@@ -1,4 +1,5 @@
 import { ProductImage } from "./product.image";
+import { ProductVariant } from "./product.variants";
 export interface Product {
   id: number;
   name: string;
@@ -8,6 +9,7 @@ export interface Product {
   category_id: number;
   url: string;
   product_images: ProductImage[];
+  product_variants: ProductVariant[];
 }
 
   

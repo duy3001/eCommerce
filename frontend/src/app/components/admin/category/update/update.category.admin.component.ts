@@ -3,6 +3,8 @@ import { Category } from '../../../../models/category';
 import { CategoryService } from '../../../../services/category.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UpdateCategoryDTO } from '../../../../dtos/category/update.category.dto';
+import { ApiResponse } from 'src/app/responses/api.response';
+import { ToastService } from 'src/app/services/toast.service';
 
 
 @Component({
@@ -19,6 +21,7 @@ export class UpdateCategoryAdminComponent implements OnInit {
     private categoryService: CategoryService,
     private route: ActivatedRoute,
     private router: Router,
+    private toastService: ToastService
   
   ) {
     this.categoryId = 0;    
@@ -36,8 +39,8 @@ export class UpdateCategoryAdminComponent implements OnInit {
   
   getCategoryDetails(): void {
     this.categoryService.getDetailCategory(this.categoryId).subscribe({
-      next: (category: Category) => {        
-        this.updatedCategory = { ...category };                        
+      next: (apiResponse: ApiResponse) => {        
+        this.updatedCategory = { ...apiResponse.data };                        
       },
       complete: () => {
         
@@ -58,7 +61,12 @@ export class UpdateCategoryAdminComponent implements OnInit {
       },
       complete: () => {
         debugger;
-        this.router.navigate(['/admin/categories']);        
+        this.toastService.showToast({
+          error: null,
+          defaultMsg: 'Cập nhật danh mục thành công',
+          title: 'Thành Công'
+        });
+        this.router.navigate(['/admin/categories']);     
       },
       error: (error: any) => {
         debugger;

@@ -22,6 +22,7 @@ import {
   HTTP_INTERCEPTORS 
 } from '@angular/common/http';
 import { OrderDetailComponent } from './components/detail-order/order.detail.component';
+import { ChangePasswordComponent } from './components/change_password/change.password.component';
 
 @NgModule({
   declarations: [    
@@ -35,7 +36,8 @@ import { OrderDetailComponent } from './components/detail-order/order.detail.com
     RegisterComponent, 
     UserProfileComponent,
     AppComponent,  
-    OrderDetailComponent,  
+    OrderDetailComponent, 
+    ChangePasswordComponent 
     //admin    
     //AdminComponent,
     //OrderAdminComponent,
@@ -51,7 +53,7 @@ import { OrderDetailComponent } from './components/detail-order/order.detail.com
     HttpClientModule,    
     AppRoutingModule,    
     NgbModule,        
-    AdminModule,
+    AdminModule
   ],
   providers: [
     {

@@ -15,6 +15,7 @@ import { AuthGuardFn } from './guards/auth.guard';
 import { AdminGuardFn } from './guards/admin.guard';
 import { OrderDetailComponent } from './components/detail-order/order.detail.component';
 import { PaymentCallbackComponent } from './payment-callback/payment-callback.component';
+import { ChangePasswordComponent } from './components/change_password/change.password.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -24,13 +25,18 @@ const routes: Routes = [
   { path: 'orders', component: OrderComponent,canActivate:[AuthGuardFn] },
   { path: 'user-profile', component: UserProfileComponent, canActivate:[AuthGuardFn] },
   { path: 'orders/user', component: OrderUserComponent },
-  { path: 'orders/user/:orderId', component: OrderDetailComponent },
+  { path: 'orders/user/:orderId', component: OrderDetailComponent, canActivate: [AuthGuardFn] },
   { path: 'payments/payment-callback', component: PaymentCallbackComponent },
+  { path: 'change-password', component: ChangePasswordComponent, canActivate:[AuthGuardFn] },
   //Admin   
   { 
     path: 'admin', 
-    component: AdminComponent, 
-    canActivate:[AdminGuardFn] 
+    canMatch: [AdminGuardFn],
+    children: [
+      { path: '', component: AdminComponent },
+
+      // Thêm các admin routes khác ở đây
+    ] 
   },      
 ];
 

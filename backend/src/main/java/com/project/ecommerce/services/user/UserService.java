@@ -1,8 +1,9 @@
 package com.project.ecommerce.services.user;
 
 import com.project.ecommerce.components.JwtTokenUtils;
-import com.project.ecommerce.dtos.UpdateUserDTO;
-import com.project.ecommerce.dtos.UserDTO;
+import com.project.ecommerce.dtos.user.ChangePasswordRequestDTO;
+import com.project.ecommerce.dtos.user.UpdateUserDTO;
+import com.project.ecommerce.dtos.user.UserDTO;
 import com.project.ecommerce.exceptions.DataNotFoundException;
 
 import com.project.ecommerce.exceptions.PermissionDenyException;
@@ -12,7 +13,6 @@ import com.project.ecommerce.repositories.UserRepository;
 import com.project.ecommerce.responses.UserResponse;
 import com.project.ecommerce.utils.MessageKeys;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,11 +33,10 @@ public class UserService implements IUserService{
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtils jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
-    private final ModelMapper modelMapper;
 
     @Override
     @Transactional
-    public User createUser(UserDTO userDTO) throws Exception {
+    public User createUser(UserDTO userDTO) {
         //register user
         String phoneNumber = userDTO.getPhoneNumber();
         // Kiểm tra xem số điện thoại đã tồn tại hay chưa
@@ -56,45 +55,33 @@ public class UserService implements IUserService{
                 .password(userDTO.getPassword())
                 .address(userDTO.getAddress())
                 .dateOfBirth(userDTO.getDateOfBirth())
-                .facebookAccountId(userDTO.getFacebookAccountId())
-                .googleAccountId(userDTO.getGoogleAccountId())
                 .active(true)
                 .build();
 
         newUser.setRole(role);
 
         // Kiểm tra nếu có accountId, không yêu cầu password
-        if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() == 0) {
-            String password = userDTO.getPassword();
-            String encodedPassword = passwordEncoder.encode(password);
-            newUser.setPassword(encodedPassword);
-        }
+//        if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() == 0) {
+//            String password = userDTO.getPassword();
+//            String encodedPassword = passwordEncoder.encode(password);
+//            newUser.setPassword(encodedPassword);
+//        }
         return userRepository.save(newUser);
     }
 
     @Override
     public String login(
             String phoneNumber,
-            String password,
-            Long roleId
+            String password
     ) throws Exception {
         Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
         if(optionalUser.isEmpty()) {
             throw new DataNotFoundException(MessageKeys.WRONG_PHONE_PASSWORD);
         }
-        //return optionalUser.get();//muốn trả JWT token ?
+        //return optionalUser.get();
         User existingUser = optionalUser.get();
         //check password
-        if (existingUser.getFacebookAccountId() == 0
-                && existingUser.getGoogleAccountId() == 0) {
-            if(!passwordEncoder.matches(password, existingUser.getPassword())) {
-                throw new BadCredentialsException(MessageKeys.WRONG_PHONE_PASSWORD);
-            }
-        }
-        Optional<Role> optionalRole = roleRepository.findById(roleId);
-        if(optionalRole.isEmpty() || !roleId.equals(existingUser.getRole().getId())) {
-            throw new DataNotFoundException(MessageKeys.ROLE_DOES_NOT_EXISTS);
-        }
+
         if(!optionalUser.get().isActive()) {
             throw new DataNotFoundException(MessageKeys.USER_IS_LOCKED);
         }
@@ -104,12 +91,16 @@ public class UserService implements IUserService{
         );
 
         //authenticate with Java Spring security
-        authenticationManager.authenticate(authenticationToken);
+        try{
+            authenticationManager.authenticate(authenticationToken);
+        } catch (BadCredentialsException exception){
+            throw new BadCredentialsException(MessageKeys.WRONG_PHONE_PASSWORD);
+        }
         return jwtTokenUtil.generateToken(existingUser);
     }
     @Transactional
     @Override
-    public User updateUser(Long userId, UpdateUserDTO updatedUserDTO) throws Exception {
+    public User updateUser(Long userId, UpdateUserDTO updatedUserDTO) {
         // Find the existing user by userId
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
@@ -134,23 +125,17 @@ public class UserService implements IUserService{
         if (updatedUserDTO.getDateOfBirth() != null) {
             existingUser.setDateOfBirth(updatedUserDTO.getDateOfBirth());
         }
-        if (updatedUserDTO.getFacebookAccountId() > 0) {
-            existingUser.setFacebookAccountId(updatedUserDTO.getFacebookAccountId());
-        }
-        if (updatedUserDTO.getGoogleAccountId() > 0) {
-            existingUser.setGoogleAccountId(updatedUserDTO.getGoogleAccountId());
-        }
 
         // Update the password if it is provided in the DTO
-        if (updatedUserDTO.getPassword() != null
-                && !updatedUserDTO.getPassword().isEmpty()) {
-            if(!updatedUserDTO.getPassword().equals(updatedUserDTO.getRetypePassword())) {
-                throw new DataNotFoundException("Password and retype password not the same");
-            }
-            String newPassword = updatedUserDTO.getPassword();
-            String encodedPassword = passwordEncoder.encode(newPassword);
-            existingUser.setPassword(encodedPassword);
-        }
+//        if (updatedUserDTO.getPassword() != null
+//                && !updatedUserDTO.getPassword().isEmpty()) {
+//            if(!updatedUserDTO.getPassword().equals(updatedUserDTO.getRetypePassword())) {
+//                throw new DataNotFoundException("Password and retype password not the same");
+//            }
+//            String newPassword = updatedUserDTO.getPassword();
+//            String encodedPassword = passwordEncoder.encode(newPassword);
+//            existingUser.setPassword(encodedPassword);
+//        }
 
         // Save the updated user
         return userRepository.save(existingUser);
@@ -178,6 +163,24 @@ public class UserService implements IUserService{
         pageUsers = userRepository.findAll(keyword, pageable);
         return pageUsers.map(UserResponse::fromUser);
     }
+
+    @Override
+    public void changePassword(Long userId, ChangePasswordRequestDTO requestDTO) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User not found"));
+
+        if( !passwordEncoder.matches(requestDTO.getCurrentPassword(), user.getPassword())){
+            throw new BadCredentialsException("Current password is incorrect");
+        }
+
+        if( !requestDTO.getNewPassword().equals(requestDTO.getConfirmPassword())){
+            throw new IllegalArgumentException("New password and confirmation do not match");
+        }
+
+        user.setPassword(passwordEncoder.encode(requestDTO.getNewPassword()));
+        userRepository.save(user);
+
+    }
+
 }
 
 

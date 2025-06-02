@@ -1,4 +1,4 @@
-package com.project.ecommerce.dtos;
+package com.project.ecommerce.dtos.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;

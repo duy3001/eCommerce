@@ -1,6 +1,7 @@
-package com.project.ecommerce.dtos;
+package com.project.ecommerce.dtos.order;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.project.ecommerce.dtos.order.OrderDetailDTO;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -15,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class OrderDTO {
+public class OrderWithDetailsDTO {
 
     @JsonProperty("user_id")
     @Min(value = 1, message = "User's ID must be > 0")
@@ -30,9 +31,6 @@ public class OrderDTO {
     @NotBlank(message = "Phone number is required")
     @Size(min = 5, message = "Phone number must be at least 5 characters")
     private String phoneNumber;
-
-    @JsonProperty("status")
-    private String status;
 
     private String address;
 
@@ -54,10 +52,6 @@ public class OrderDTO {
     @JsonProperty("payment_method")
     private String paymentMethod;
 
-    @JsonProperty("vnp_txn_ref")
-    private String vnpTxnRef;
-
-    @JsonProperty("cart_items")
-    private List<CartItemDTO> cartItems;
-
+    @JsonProperty("order_details")
+    private List<OrderDetailDTO> orderDetailDTOS;
 }

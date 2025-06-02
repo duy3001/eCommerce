@@ -1,4 +1,4 @@
-package com.project.ecommerce.dtos;
+package com.project.ecommerce.dtos.order;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
@@ -11,13 +11,14 @@ import lombok.*;
 @Getter
 @Setter
 public class OrderDetailDTO {
+
     @JsonProperty("order_id")
     @Min(value=1, message = "Order's ID must be > 0")
     private Long orderId;
 
     @Min(value=1, message = "Product's ID must be > 0")
-    @JsonProperty("product_id")
-    private Long productId;
+    @JsonProperty("variant_id")
+    private Long variantId;
 
     @Min(value=0, message = "Product's ID must be >= 0")
     private Float price;
@@ -30,5 +31,4 @@ public class OrderDetailDTO {
     @JsonProperty("total_money")
     private Float totalMoney;
 
-    private String color;
 }

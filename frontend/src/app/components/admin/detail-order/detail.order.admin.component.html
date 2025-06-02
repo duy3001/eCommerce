@@ -9,9 +9,9 @@
       <p><strong>Họ tên người đặt:</strong> {{ orderResponse.fullname }}</p>
       <p><strong>Số điện thoại:</strong> {{ orderResponse.phone_number }}</p>
       <p><strong>Email:</strong> {{ orderResponse.email }}</p>
-      <p><strong>Địa chỉ nhận hàng:</strong> {{ orderResponse.address }}</p>
+      <p><strong>Địa chỉ nhận hàng:</strong> {{ orderResponse.shipping_address }}</p>
       <p><strong>Ghi chú:</strong> {{ orderResponse.note }}</p>
-      <p><strong>Ngày đặt hàng:</strong> {{ orderResponse.order_date | date }}</p>
+      <p><strong>Ngày đặt hàng:</strong> {{ orderResponse.order_date | date:'dd/MM/yyyy' }}</p>
       
       <div class="form-group">
         <label for="statusSelect"><strong>Status:</strong></label>
@@ -19,7 +19,7 @@
           [(ngModel)]="orderResponse.status">
           <option value="pending">Đợi duyệt</option>
           <option value="processing">Chờ lấy hàng</option>
-          <option value="shipped">Đã vận chuyển</option>
+          <option value="shipping">Đang vận chuyển</option>
           <option value="delivered">Đã giao</option>
           <option value="cancelled">Đã huỷ</option>
         </select>

@@ -52,14 +52,9 @@
                     <label for="address" class="form-label">Địa chỉ:</label>
                     <input type="text" 
                         class="form-control" 
-                        formControlName="address"                         
+                        formControlName="shipping_address"                         
                         placeholder="Địa chỉ" 
-                        required
-                        id="address" 
-                        [class.is-invalid]="orderForm.get('address')!.invalid && orderForm.get('address')!.touched">
-                    <div *ngIf="orderForm.get('address')!.invalid && orderForm.get('address')!.touched" class="invalid-feedback">
-                        Địa chỉ là trường bắt buộc và ít nhất 5 ký tự.
-                    </div>
+                        id="address">
                 </div>
                 <div class="mb-3">
                     <label for="note" class="form-label">Ghi chú:</label>
@@ -105,8 +100,11 @@
                       <tr>
                         <td>
                           <div class="product-info">
-                            <img [src]="item.product.thumbnail" alt="Product Image" class="product-image">
-                            <span class="product-name">{{ item.product.name }}</span>
+                            <img [src]="item.variant.thumbnail" alt="Product Image" class="product-image">
+                            <div class="product-details">
+                                <span class="product-name">{{ item.variant.product_name }}</span>
+                                <span class="product-variant">{{ item.variant.variant_name }}</span>
+                              </div>
                           </div>
                         </td>
                         <td>
@@ -118,8 +116,8 @@
                             </div>
                           </div>
                         </td>
-                        <td class="product-name">{{ item.product.price | currency:'VND' }}</td>
-                        <td class="product-name">{{ (item.product.price * item.quantity) | currency:'VND' }}</td>
+                        <td class="product-name">{{ item.variant.price | currency:'VND' }}</td>
+                        <td class="product-name">{{ (item.variant.price * item.quantity) | currency:'VND' }}</td>
                         <td>
                           <button class="btn btn-danger" (click)="confirmDelete(i)">
                             Xóa

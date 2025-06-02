@@ -16,7 +16,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "AND (:status IS NULL OR o.status = :status OR :status = '') " +
             "AND ((:keyword) IS NULL OR :keyword = '' OR " +
             "LOWER(o.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
-            "OR LOWER(o.address) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
+            "OR LOWER(o.shippingAddress) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
             "OR LOWER(o.note) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
             "OR LOWER(o.email) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
             "OR LOWER(o.phoneNumber) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
@@ -28,7 +28,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE o.active = true " +
         "AND (:keyword IS NULL OR :keyword = '' OR " +
         "LOWER(o.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-        "OR LOWER(o.address) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+        "OR LOWER(o.shippingAddress) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
         "OR LOWER(o.note) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
         "OR LOWER(o.email) LIKE LOWER(CONCAT('%', :keyword, '%'))) ")
     Page<Order> findAll(@Param("keyword") String keyword, Pageable pageable);

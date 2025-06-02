@@ -1,7 +1,7 @@
 package com.project.ecommerce.services.payment;
 
-import com.project.ecommerce.dtos.PaymentDTO;
-import com.project.ecommerce.dtos.PaymentQueryDTO;
+import com.project.ecommerce.dtos.payment.PaymentDTO;
+import com.project.ecommerce.dtos.payment.PaymentQueryDTO;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.IOException;

@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { OrderDTO } from '../dtos/order/order.dto';
 import { OrderResponse } from '../responses/order/order.response';
+import { ApiResponse } from '../responses/api.response';
 
 @Injectable({
   providedIn: 'root',
@@ -19,41 +20,41 @@ export class OrderService {
 
   constructor(private http: HttpClient) {}
 
-  placeOrder(orderData: OrderDTO): Observable<any> {    
+  placeOrder(orderData: OrderDTO): Observable<ApiResponse> {    
     // Gửi yêu cầu đặt hàng
-    return this.http.post(this.apiUrl, orderData);
+    return this.http.post<ApiResponse>(this.apiUrl, orderData);
   }
-  getOrderById(orderId: number): Observable<any> {
+  getOrderById(orderId: number): Observable<ApiResponse> {
     const url = `${environment.apiBaseUrl}/orders/${orderId}`;
-    return this.http.get(url);
+    return this.http.get<ApiResponse>(url);
   }
   getAllOrders(keyword:string,
     page: number, limit: number
-  ): Observable<OrderResponse[]> {
+  ): Observable<ApiResponse> {
       const params = new HttpParams()
       .set('keyword', keyword)      
       .set('page', (page).toString())
       .set('limit', limit.toString());            
-      return this.http.get<any>(this.apiGetAllOrders, { params });
+      return this.http.get<ApiResponse>(this.apiGetAllOrders, { params });
   }
-  getOrdersByUser(keyword: string, status: string): Observable<OrderResponse[]> {
+  getOrdersByUser(keyword: string, status: string): Observable<ApiResponse> {
     const params = new HttpParams()
     .set('keyword', keyword)
     .set('status', status);   
-    return this.http.get<OrderResponse[]>(`${environment.apiBaseUrl}/orders/user`, {params});
+    return this.http.get<ApiResponse>(`${environment.apiBaseUrl}/orders/user`, {params});
   }
   
-  updateOrder(orderId: number, orderData: OrderDTO): Observable<any> {
+  updateOrder(orderId: number, orderData: OrderDTO): Observable<ApiResponse> {
     const url = `${environment.apiBaseUrl}/orders/${orderId}`;
-    return this.http.put(url, orderData);
+    return this.http.put<ApiResponse>(url, orderData);
   }
-  deleteOrder(orderId: number): Observable<any> {
+  deleteOrder(orderId: number): Observable<ApiResponse> {
     const url = `${environment.apiBaseUrl}/orders/${orderId}`;
-    return this.http.delete(url, { responseType: 'text' });
+    return this.http.delete<ApiResponse>(url);
   }
-  updateOrderStatus(orderId: number, status: string): Observable<any> {
+  updateOrderStatus(orderId: number, status: string): Observable<ApiResponse> {
     const url = `${environment.apiBaseUrl}/orders/${orderId}/status`;
     const params = new HttpParams().set('status', status); // Thêm tham số status vào query params
-    return this.http.put(url, null, { params }); // Gửi yêu cầu PUT với tham số status
+    return this.http.put<ApiResponse>(url, null, { params }); // Gửi yêu cầu PUT với tham số status
   }
 }
